@@ -394,7 +394,7 @@ body.furigana-off rt { visibility: hidden; } /* 先生の設定用。ふだん�
 }
 .word-card img { width: 110px; height: 84px; }
 .word-card--chip { /* メーターに置いた小さいカード */
-  font-size: var(--fs-small); padding: 4px 16px; transform: rotate(-1deg); box-shadow: none; border-width: 3px;
+  font-size: var(--fs-small); padding: 4px 16px; transform: rotate(-1deg); box-shadow: none; border-width: 3px; gap: 0;
 }
 #meter, .meter {
   width: 560px; height: 320px;
