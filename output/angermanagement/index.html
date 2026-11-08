@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>いかりと なかよく なろう</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* style.css を補う小さな追加（game.js の画面づくりに必要な分だけ） */
+  #progress { flex-direction: column; align-items: flex-start; gap: 6px; flex: 1 1 auto; }
+  #topbar.is-title #step-tag, #topbar.is-title #progress { visibility: hidden; }
+  .set-btn .set-label { display: block; font-size: var(--fs-small); line-height: 1.15; letter-spacing: -.02em; }
+  .set-btn img { width: 44px; height: 44px; }
+  .set-btn:disabled { opacity: .45; cursor: default; }
+  #q-text:focus, #q-text:focus-visible, .clear-text:focus-visible, .result-list:focus-visible { outline-color: transparent !important; }
+  .board > .side { grid-area: side; position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+  .board > .side .speech { margin-bottom: 26px; }
+  #visual .meter { width: 780px; }
+  #visual .meter.is-wide { width: 1040px; }
+  .meter-label img.face { width: 38px; height: 38px; }
+  .hint-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: var(--fs-small); font-weight: 700; }
+  .hint-item img { height: 200px; width: auto; }
+  .hint-text { max-width: 760px; padding: 22px 32px; background: #fff; border: var(--line) solid var(--c-ink); border-radius: var(--radius-hand2); font-size: 40px; font-weight: 700; line-height: 1.5; word-break: keep-all; }
+  .hint-marks { display: flex; flex-wrap: wrap; gap: 14px; width: 360px; justify-content: center; }
+  .hint-marks img { width: 96px; height: 92px; border-radius: 16px; opacity: .45; }
+  .hint-marks img.hint-glow { opacity: 1; }
+  #visual.has-hint .situation-card { font-size: 36px; padding: 12px 26px 12px 12px; gap: 18px; }
+  #visual.has-hint .situation-card img { width: 220px; height: 165px; }
+  #visual.has-hint > .visual-img { max-height: 220px; }
+  .situation-card .pair { display: flex; gap: 8px; }
+  #screen-play[data-mode="model"] .choice--box { width: 400px; height: 190px; cursor: default; }
+  #screen-play[data-mode="model"] .choice--box:hover { transform: none; box-shadow: 0 8px 0 var(--c-ink-soft); }
+  .box-chip { position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%) rotate(-2deg); white-space: nowrap; }
+  .clear-wrap .btn-primary { margin-top: 8px; }
+  .result-actions .result-note { flex: 1; }
+  .result-actions .btn-primary { margin-left: 0; }
+</style>
+</head>
+<body>
+<div id="stage3d" aria-hidden="true"></div>
+
+<div id="app">
+  <!-- 上の帯: ステップ名／進み具合／設定（どの画面でも同じ位置） -->
+  <header id="topbar" class="is-title">
+    <div id="step-tag"></div>
+    <div id="progress" aria-live="polite">
+      <span class="progress-text"></span>
+      <ol class="progress-dots" aria-hidden="true"></ol>
+    </div>
+    <div id="settings">
+      <button id="btn-sound" class="set-btn" type="button" aria-pressed="true">
+        <img src="assets/icon-sound-on.svg" alt=""><span class="set-label">おと</span><span class="set-label set-state">あり</span>
+      </button>
+      <button id="btn-motion" class="set-btn" type="button" aria-pressed="false">
+        <img src="assets/icon-motion.svg" alt=""><span class="set-label">うごき</span><span class="set-label set-state">ふつう</span>
+      </button>
+      <button id="btn-rest" class="set-btn" type="button">
+        <img src="assets/icon-rest.svg" alt=""><span class="set-label">おやすみ</span>
+      </button>
+      <button id="btn-back" class="set-btn" type="button">
+        <img src="assets/icon-back.svg" alt=""><span class="set-label">もどる</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 1. タイトル -->
+  <section id="screen-title" class="screen is-active" aria-label="タイトル">
+    <div class="paper poster">
+      <span class="tape tape--tl" aria-hidden="true"></span>
+      <span class="tape tape--tr" aria-hidden="true"></span>
+      <h1 class="title-logo">いかりと <span class="accent">なかよく</span> なろう</h1>
+      <p class="title-sub">こころの おんどけいを しらべよう</p>
+      <button id="btn-start" class="btn-primary" type="button">はじめる</button>
+    </div>
+    <img class="title-ondokei" src="assets/kokoro-ondokei.svg" alt="こころの おんどけい。下が 小さい、上が 大きい いかり">
+    <img class="teacher" src="assets/teacher.svg" alt="ほけんしつの せんせい">
+  </section>
+
+  <!-- 2. おてほん・もんだい（data-mode = model / quiz） -->
+  <section id="screen-play" class="screen" data-mode="quiz" aria-label="もんだい">
+    <div id="board" class="board paper">
+      <span class="tape tape--tl" aria-hidden="true"></span>
+      <img class="pin" src="assets/pin.svg" alt="" style="right:18px; top:12px">
+      <div id="question-area">
+        <p id="q-text" class="q-text" tabindex="-1"></p>
+        <button id="btn-read" class="read-btn" type="button" aria-label="もんだいを よみあげる">
+          <img src="assets/icon-speaker.svg" alt="">よむ
+        </button>
+      </div>
+      <div id="visual"></div>
+      <div id="feedback" role="status" aria-live="polite"></div>
+      <div id="choices"></div>
+      <div id="side">
+        <div id="speech" aria-live="polite"></div>
+        <img id="teacher" src="assets/teacher.svg" alt="ほけんしつの せんせい">
+      </div>
+    </div>
+  </section>
+
+  <!-- ステップクリア -->
+  <section id="screen-clear" class="screen" aria-label="ステップクリア">
+    <div class="board paper">
+      <span class="tape tape--tl" aria-hidden="true"></span>
+      <span class="tape tape--tr" aria-hidden="true"></span>
+      <div class="clear-wrap">
+        <img id="clear-medal" src="assets/medal-step1.svg" alt="">
+        <p class="clear-text" tabindex="-1"></p>
+        <button id="btn-clear-next" class="btn-primary btn-next" type="button" hidden>つぎへ</button>
+      </div>
+      <div class="side">
+        <div class="speech" aria-live="polite"></div>
+        <img class="teacher is-happy" src="assets/teacher.svg" alt="ほけんしつの せんせい">
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. ふり返り -->
+  <section id="screen-result" class="screen" aria-label="ふりかえり">
+    <div class="board paper">
+      <span class="tape tape--tl" aria-hidden="true"></span>
+      <span class="tape tape--tr" aria-hidden="true"></span>
+      <ul class="result-list" tabindex="-1" aria-label="きょう できたこと"></ul>
+      <div class="result-actions">
+        <p class="result-note"></p>
+        <button id="btn-again" class="btn-secondary" type="button">もういちど</button>
+        <button id="btn-end" class="btn-primary" type="button">おわる</button>
+      </div>
+      <div class="side">
+        <div class="speech" aria-live="polite"></div>
+        <img class="teacher" src="assets/teacher.svg" alt="ほけんしつの せんせい">
+      </div>
+    </div>
+  </section>
+
+  <!-- おやすみ -->
+  <div id="rest-overlay" role="dialog" aria-modal="true" aria-labelledby="rest-msg">
+    <img src="assets/icon-rest.svg" alt="">
+    <p id="rest-msg" style="margin:0">ひとやすみ しよう。いつでも もどれるよ</p>
+    <button id="btn-resume" class="btn-primary" type="button">つづける</button>
+  </div>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script src="motion3d.js"></script>
+<script src="bgm.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
