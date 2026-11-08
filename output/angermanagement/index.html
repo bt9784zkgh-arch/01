@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="style.css">
 <style>
   /* style.css を補う小さな追加（game.js の画面づくりに必要な分だけ） */
+  [hidden] { display: none !important; }
   .title-logo { word-break: keep-all; line-break: strict; }
   #progress { flex-direction: column; align-items: flex-start; gap: 6px; flex: 1 1 auto; }
   #topbar.is-title #step-tag, #topbar.is-title #progress { visibility: hidden; }
@@ -32,7 +33,9 @@
   #visual.has-hint .situation-card .pair img { width: 180px; height: 135px; }
   .hint-row { display: flex; align-items: center; gap: 8px; padding: 6px; }
   .hint-row img { height: 140px; width: auto; }
-  #screen-play[data-mode="model"] .choice--box { width: 400px; height: 190px; cursor: default; }
+  #screen-play[data-mode="model"] .choice--box { width: 420px; height: 190px; padding: 20px 16px; gap: 14px; cursor: default; }
+  #screen-play[data-mode="model"] .choice--box .choice-icon { width: 72px; height: 72px; }
+  .choice--box > span:not(.key-num):not(.box-chip) { white-space: nowrap; }
   #screen-play[data-mode="model"] .choice--box:hover { transform: none; box-shadow: 0 8px 0 var(--c-ink-soft); }
   .box-chip { position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%) rotate(-2deg); white-space: nowrap; }
   .clear-wrap .btn-primary { margin-top: 8px; }

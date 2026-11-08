@@ -480,20 +480,23 @@
   function wakeAll() { for (var i = 0; i < actors.length; i++) actors[i].sleeping = false; kick(); }
 
   /* ---------- タイトル ----------
-     温度計・ハート・しずくが ポスターの右上の空間（#app 1920基準で x1300〜1880, y150〜480）に
-     奥から飛び出し、ゆっくり回りながら浮かぶ。まとまりごと少し回り込む。
-     温度計の液が 上がって→下がる（ハートの中のほのおも 大→小、赤→青）。1周 9秒 */
+     ハート（中に小さなほのお）と しずく が ポスターの右の空間に 奥から飛び出し、
+     ゆっくり回りながら浮かぶ。まとまりごと少し回り込む。
+     （温度計は SVG の .title-ondokei があるので 3D では出さない）
+     置き場所: #app 1920基準で 中心 (1580, 345)。上はしは 浮き・回り込み・飛び出しの行きすぎを入れても
+     y≒240 より下（設定ボタンの帯 y≦164 から 70px 以上あける）。下はしは y≒440 で、
+     せんせい（y520〜）・SVG温度計（y500〜）・「はじめる」（ポスターの中）にかからない。
+     ほのおが 大きく赤く → 小さく青く（いかりは 下げられる）。1周 9秒 */
+  var TITLE_CENTER = { x: 1580, y: 345 };
   function buildTitle() {
     var mats = [];
     var root = new THREE.Group();
     var pivot = new THREE.Group(); root.add(pivot);
-    var thermo = makeThermometer(mats);
     var heart = makeHeart(mats, true);
     var drop = makeDrop(mats, C.lv1);
     var items = [
-      { o: thermo, x: 0, y: 0, z: 0, s: 1.25, delay: 0.0, spin: 0.25 },
-      { o: heart, x: -1.95, y: 0.35, z: 0.3, s: 1.1, delay: 0.25, spin: 0.35 },
-      { o: drop, x: 1.75, y: -0.15, z: 0.2, s: 1.0, delay: 0.5, spin: 0.3 }
+      { o: heart, x: -0.35, y: 0.05, z: 0.3, s: 1.45, delay: 0.0, spin: 0.35 },
+      { o: drop, x: 1.35, y: -0.2, z: 0.2, s: 1.0, delay: 0.35, spin: 0.3, isDrop: true }
     ];
     items.forEach(function (it) { pivot.add(it.o); });
     var flameCol = new THREE.Color();
@@ -502,7 +505,7 @@
     var a = addActor(root, function (t) {
       var R = reduced();
       // 位置（画面サイズが変わっても追従）
-      var c = appToWorld(1590, 320), u = unit();
+      var c = appToWorld(TITLE_CENTER.x, TITLE_CENTER.y), u = unit();
       root.position.set(c.x, c.y, 0);
       root.scale.setScalar(u);
       // まとまりの回り込み（とてもゆっくり、±0.28rad）
@@ -514,33 +517,32 @@
         if (R) {
           o.position.set(it.x, it.y, it.z);
           o.scale.setScalar(it.s);
-          o.rotation.set(0, 0, i === 2 ? Math.PI : 0);
+          o.rotation.set(0, 0, it.isDrop ? Math.PI : 0);
         } else {
           e = easeOutBack((t - it.delay) / 1.3);           // 奥(-14)から飛び出す
           var tt = Math.max(0, t - it.delay - 1.3);
-          o.position.set(it.x, it.y + Math.sin(tt * 0.9 + i * 2) * 0.12 * clamp01(tt), lerp(-14, it.z, e));
+          o.position.set(it.x, it.y + Math.sin(tt * 0.9 + i * 2) * 0.1 * clamp01(tt), lerp(-14, it.z, e));
           o.scale.setScalar(it.s * Math.max(0.001, lerp(0.4, 1, easeOutCubic((t - it.delay) / 1.0))));
           o.rotation.y = (1 - easeOutCubic((t - it.delay) / 1.6)) * Math.PI * 1.5 + Math.sin(tt * it.spin + i) * 0.45;
-          if (i === 2) o.rotation.z = Math.PI;
+          if (it.isDrop) o.rotation.z = Math.PI;
         }
       });
       // 全体のフェードイン
       var fade = clamp01(t / (R ? 0.8 : 0.5));
-      if (a && a.fadeFrom != null) fade *= 1 - clamp01((t - a.fadeFrom) / 0.4);
       setOpacity(mats, fade);
 
-      // 温度計の液: 上がる → しばらく → 下がる（いかりは 下げられる）
-      var cyc = ((t - 1.8) % 9 + 9) % 9, lv;
-      if (t < 1.8) lv = 0.33;
-      else if (cyc < 3) lv = lerp(0.33, 1.0, easeInOut(cyc / 3));
-      else if (cyc < 4.5) lv = 1.0;
-      else if (cyc < 7.5) lv = lerp(1.0, 0.33, easeInOut((cyc - 4.5) / 3));
-      else lv = 0.33;
-      if (R) lv = 0.33;
-      thermo.userData.setLevel(lv);
+      // いかりの大きさ: 上がる → しばらく → 下がる（いかりは 下げられる）
+      var cyc = ((t - 1.8) % 9 + 9) % 9, hot;
+      if (t < 1.8) hot = 0;
+      else if (cyc < 3) hot = easeInOut(cyc / 3);
+      else if (cyc < 4.5) hot = 1;
+      else if (cyc < 7.5) hot = 1 - easeInOut((cyc - 4.5) / 3);
+      else hot = 0;
+      if (R) hot = 0;
       if (R && t > 1 && a) a.sleeping = true;   // うごき すくなめ: 表示が終わったら止める
-      var hot = clamp01((lv - 0.33) / 0.67);
-      heart.userData.flame.scale.setScalar(0.38 + 0.25 * hot);
+      // ほのお: 小さく青い ⇔ 大きく やさしい赤（ハートの中に おさまる大きさ）
+      heart.userData.flame.scale.setScalar(0.34 + 0.34 * hot);
+      heart.userData.flame.position.y = -0.04 + 0.04 * hot;
       flameCol.copy(cCool).lerp(cHot, hot);
       heart.userData.flameMat.color.copy(flameCol);
       return true;

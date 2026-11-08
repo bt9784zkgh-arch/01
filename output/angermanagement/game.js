@@ -41,7 +41,7 @@ const LESSON = {
           answer: 'もっている',
           visual: [{ img: 'people.svg', alt: 'クラスの みんな。むねに 小さな ほのお' }],
           praise: 'いいね！ みんなの なかに あるね',
-          hint: { say: 'ほのおを 1{人|り}ずつ みてみよう',
+          hint: { say: 'ほのおを ひとりずつ みてみよう',
                   show: [{ marks: 5 }] } },
         { q: 'いかりは じぶんで しずめられる？',
           choices: [{ label: 'しずめられる' }, { label: 'しずめられない' }],
@@ -264,7 +264,7 @@ addEventListener('resize', fitApp); fitApp();
     page: -1,           // -1 = タイトル
     misses: 0,
     locked: false,
-    placed: {},         // ステップ2で置いたもの: { qi: { text, lv } }
+    placed: {},         // ステップ2で置いたもの: { qi: [ { text, lv }, ... ] }
     timers: [],
     token: 0,
     started: false
@@ -438,9 +438,14 @@ addEventListener('resize', fitApp); fitApp();
   function placedBefore(qi) {
     const out = [];
     Object.keys(state.placed).map(Number).sort((a, b) => a - b).forEach(k => {
-      if (qi === undefined || k < qi) out.push(state.placed[k]);
+      if (qi === undefined || k < qi) state.placed[k].forEach(c => out.push(c));
     });
     return out;
+  }
+  /* 前の問題で もう メーターに 置いた ことばの 高さ（なければ 0） */
+  function placedLevel(text, qi) {
+    const hit = placedBefore(qi).filter(c => plain(c.text) === plain(text));
+    return hit.length ? hit[hit.length - 1].lv : 0;
   }
   function makeNextButton(onClick) {
     const b = el('button', { id: 'btn-next', class: 'btn-primary btn-next', type: 'button' }, esc(LESSON.words.next));
@@ -603,11 +608,24 @@ addEventListener('resize', fitApp); fitApp();
     /* ステップ2: 正誤なし。どれでも受けとめる */
     if (st.kind === 'level') {
       state.locked = true;
-      const label = q.pair ? opts[i].label : q.word.text;
-      const lv = q.pair ? 3 : opts[i].lv;
-      state.placed[pg.qi] = { text: label, lv };
+      /* 置き方:
+         - 1・2問: えらんだ 高さに ことばを 置く
+         - 3・4問（どっちが 強そう？）: えらんだ ほうを 上、もう1つを 下に置く。
+           前の問題で もう置いた ことばは 動かさず、2つめを ちょうど1だん 上か下に置く
+           （同じことばが 2か所に 出ないように し、えらんだ ほうが 下に ならないように する） */
+      const add = [];
+      if (q.pair) {
+        const strong = opts[i].label, weak = opts[1 - i].label;
+        const ls = placedLevel(strong, pg.qi), lw = placedLevel(weak, pg.qi);
+        if (!ls && !lw) { add.push({ text: strong, lv: 3 }, { text: weak, lv: 1 }); }
+        else if (ls && !lw) { add.push({ text: weak, lv: Math.max(ls - 1, 1) }); }
+        else if (!ls && lw) { add.push({ text: strong, lv: Math.min(lw + 1, 3) }); }
+      } else {
+        add.push({ text: q.word.text, lv: opts[i].lv });
+      }
+      state.placed[pg.qi] = add;
       const meter = $('#meter', visual);
-      if (meter) addChip(meter, label, lv);
+      if (meter) add.forEach(c => addChip(meter, c.text, c.lv));
       btn.classList.add('is-placed');
       buttons.forEach(b => { b.disabled = true; if (b !== btn) b.hidden = true; });
       showFeedback('accept', q.praise, 2200);
@@ -646,8 +664,10 @@ addEventListener('resize', fitApp); fitApp();
       visual.querySelectorAll('.visual-img, .situation-card img, .situation-card .pair, .word-card')
         .forEach(n => n.classList.add('hint-glow'));
     } else if (state.misses === 2) {
-      showFeedback('retry', LESSON.words.retry, 1800);
+      /* ヒントの絵が 札に かくれないよう、2回目は 札を出さず ふきだしで つたえる */
+      hideFeedback();
       showHint(q.hint);
+      if (q.hint && q.hint.say) setSpeech(speech, LESSON.words.retry + '。' + q.hint.say);
       /* 候補を2つに しぼる（3つ以上あるとき） */
       if (buttons.length > 2) {
         const keep = buttons.findIndex((b, k) => k !== answerIdx && k !== i);
