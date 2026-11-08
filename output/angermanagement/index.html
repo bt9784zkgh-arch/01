@@ -7,9 +7,10 @@
 <link rel="stylesheet" href="style.css">
 <style>
   /* style.css を補う小さな追加（game.js の画面づくりに必要な分だけ） */
+  .title-logo { word-break: keep-all; line-break: strict; }
   #progress { flex-direction: column; align-items: flex-start; gap: 6px; flex: 1 1 auto; }
   #topbar.is-title #step-tag, #topbar.is-title #progress { visibility: hidden; }
-  .set-btn .set-label { display: block; font-size: var(--fs-small); line-height: 1.15; letter-spacing: -.02em; }
+  .set-btn .set-label { display: block; font-size: var(--fs-small); line-height: 1.15; letter-spacing: -.07em; white-space: nowrap; }
   .set-btn img { width: 44px; height: 44px; }
   .set-btn:disabled { opacity: .45; cursor: default; }
   #q-text:focus, #q-text:focus-visible, .clear-text:focus-visible, .result-list:focus-visible { outline-color: transparent !important; }
@@ -28,11 +29,14 @@
   #visual.has-hint .situation-card img { width: 220px; height: 165px; }
   #visual.has-hint > .visual-img { max-height: 220px; }
   .situation-card .pair { display: flex; gap: 8px; }
+  #visual.has-hint .situation-card .pair img { width: 180px; height: 135px; }
+  .hint-row { display: flex; align-items: center; gap: 8px; padding: 6px; }
+  .hint-row img { height: 140px; width: auto; }
   #screen-play[data-mode="model"] .choice--box { width: 400px; height: 190px; cursor: default; }
   #screen-play[data-mode="model"] .choice--box:hover { transform: none; box-shadow: 0 8px 0 var(--c-ink-soft); }
   .box-chip { position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%) rotate(-2deg); white-space: nowrap; }
   .clear-wrap .btn-primary { margin-top: 8px; }
-  .result-actions .result-note { flex: 1; }
+  .result-actions .result-note { flex: 1; word-break: keep-all; overflow-wrap: anywhere; line-break: strict; }
   .result-actions .btn-primary { margin-left: 0; }
 </style>
 </head>

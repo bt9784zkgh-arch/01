@@ -120,7 +120,7 @@ const LESSON = {
           answer: 'かえられない',
           praise: 'そのとおり！ しぜんは かえられないね',
           hint: { say: 'じぶんで とめられるかな？',
-                  show: [{ img: 'icon-hand.svg', alt: 'て', label: 'て で おさえても…' }, { img: 'typhoon.svg', alt: '台風', label: 'とまらない' }] } },
+                  show: [{ imgs: ['icon-hand.svg', 'typhoon.svg'], alt: 'てで 台風を おさえても とまらない', label: 'てで おさえても とまらない' }] } },
         { q: 'じぶんで かえられる？ かえられない？',
           card: { imgs: ['traffic.svg'], text: '{道|みち}が こんで {車|くるま}が すすまない', alt: '車が ずらっと ならぶ 道' },
           answer: 'かえられない',
@@ -300,12 +300,13 @@ addEventListener('resize', fitApp); fitApp();
     restReturnFocus = document.activeElement;
     restOverlay.classList.add('is-show');
     topbar.inert = true; Object.values(screens).forEach(s => { s.inert = true; });
-    S('setMuted', true);
+    S('stop');
     $('#btn-resume').focus();
   }
   function closeRest() {
     restOverlay.classList.remove('is-show');
     topbar.inert = false; Object.values(screens).forEach(s => { s.inert = false; });
+    if (state.started) S('start');
     S('setMuted', !settings.sound);
     S('play', 'tap');
     if (restReturnFocus && document.contains(restReturnFocus)) restReturnFocus.focus();
@@ -611,8 +612,7 @@ addEventListener('resize', fitApp); fitApp();
       buttons.forEach(b => { b.disabled = true; if (b !== btn) b.hidden = true; });
       showFeedback('accept', q.praise, 2200);
       setSpeech(speech, q.praise); setTeacher('is-happy');
-      S('play', 'correct');
-      const c = centerOf(btn); M('celebrate', c[0], c[1]);
+      S('play', 'correct');   /* 正誤なしなので 3Dの紙ふぶきは出さず、音だけで ひかえめに */
       afterAnswer(tok);
       return;
     }
@@ -681,10 +681,15 @@ addEventListener('resize', fitApp); fitApp();
         marks.forEach((im, k) => later(() => im.classList.add('hint-glow'), 500 + k * 700));
       } else if (h.text) {
         visual.appendChild(el('div', { class: 'hint-text hint-glow' }, ruby(h.text)));
-      } else if (h.img) {
+      } else if (h.img || h.imgs) {
         const it = el('div', { class: 'hint-item' });
-        const im = img(h.img, h.alt, 'hint-glow');
-        it.appendChild(im);
+        if (h.imgs) {
+          const row = el('div', { class: 'hint-row hint-glow', role: 'img', 'aria-label': h.alt || '' });
+          h.imgs.forEach(f => row.appendChild(img(f, '')));
+          it.appendChild(row);
+        } else {
+          it.appendChild(img(h.img, h.alt, 'hint-glow'));
+        }
         if (h.label) it.appendChild(el('span', null, ruby(h.label)));
         visual.appendChild(it);
       }
@@ -729,7 +734,7 @@ addEventListener('resize', fitApp); fitApp();
   function renderResult() {
     clearTimers(); stopReading();
     state.token++;
-    showScreen('result'); M('setScene', 'result');
+    showScreen('result');
     stepTag.textContent = 'きょう できたこと';
     progText.textContent = 'ぜんぶ おわったよ';
     progDots.innerHTML = '';
@@ -745,6 +750,7 @@ addEventListener('resize', fitApp); fitApp();
     $('.result-note', scr).innerHTML = ruby(LESSON.result.note);
     setSpeech($('.speech', scr), LESSON.result.say);
     focusQuiet(list);
+    M('setScene', 'result');   /* .result-item img を出してから呼ぶ（3Dのメダルを重ねるため） */
   }
 
   function showTitle(ended) {
