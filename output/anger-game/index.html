@@ -1,0 +1,397 @@
+<title>イライラ温度計クエスト</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Layout: one worksheet card at a time under a sticky thermometer bar that cools as you play */
+:root {
+  --bg: #eef3f1;
+  --paper: #ffffff;
+  --ink: #1f2a2e;
+  --muted: #5d6b70;
+  --line: #cfdad7;
+  --hot: #e2482f;
+  --warm: #f09a2b;
+  --cool: #2a8fb8;
+  --calm: #2f9e6e;
+  --soft: #f4f8f7;
+  --display: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141b1e; --paper: #1d272b; --ink: #e8efed; --muted: #9eadb1; --line: #33434a;
+    --hot: #ff6a4d; --warm: #ffb14d; --cool: #5cb8dd; --calm: #5cc795; --soft: #233035;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141b1e; --paper: #1d272b; --ink: #e8efed; --muted: #9eadb1; --line: #33434a;
+  --hot: #ff6a4d; --warm: #ffb14d; --cool: #5cb8dd; --calm: #5cc795; --soft: #233035;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-weight: 500;
+  font-size: 16px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 40px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 600px; margin: 0 auto; }
+
+/* thermometer bar */
+.meter {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  padding-block: 14px 10px; display: grid; gap: 6px;
+}
+.meter-row { display: flex; align-items: center; gap: 10px; }
+.meter-label { font-size: 13px; color: var(--muted); letter-spacing: .06em; white-space: nowrap; }
+.tube { flex: 1; height: 14px; border-radius: 99px; background: var(--paper); border: 2px solid var(--line); overflow: hidden; }
+.fill { height: 100%; width: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--cool), var(--warm), var(--hot)); background-size: 600px 100%; transition: width .6s ease; }
+.temp { font-family: var(--display); font-size: 20px; font-variant-numeric: tabular-nums; min-width: 4.2em; text-align: right; }
+.steps { display: flex; gap: 6px; }
+.step { flex: 1; height: 5px; border-radius: 3px; background: var(--line); }
+.step.done { background: var(--calm); }
+.step.now { background: var(--warm); }
+
+/* card */
+.card { background: var(--paper); border: 2px solid var(--line); border-radius: 18px; padding: 24px 22px; display: grid; gap: 16px; margin-top: 8px; }
+.eyebrow { font-size: 13px; letter-spacing: .12em; color: var(--muted); font-weight: 700; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(30px, 8vw, 44px); line-height: 1.25; margin: 0; text-wrap: balance; }
+h1 .hot { color: var(--hot); }
+h2 { font-family: var(--display); font-weight: 400; font-size: clamp(22px, 5.6vw, 28px); line-height: 1.35; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.story { background: var(--soft); border-radius: 12px; padding: 14px 16px; font-size: 15px; }
+.rule { font-weight: 700; }
+.q { font-size: clamp(19px, 5vw, 23px); font-weight: 900; line-height: 1.5; text-wrap: balance; }
+.qsub { color: var(--muted); font-size: 14px; }
+.count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.opts { display: grid; gap: 10px; }
+.opts.two { grid-template-columns: 1fr 1fr; }
+.opts.three { grid-template-columns: repeat(3, 1fr); }
+button { font: inherit; color: inherit; cursor: pointer; }
+.opt {
+  background: var(--paper); border: 2px solid var(--line); border-radius: 14px;
+  padding: 14px 12px; font-weight: 700; font-size: 16px; line-height: 1.45; text-align: center;
+  transition: transform .12s, border-color .12s, background .12s;
+}
+.opt.wide { text-align: left; padding-inline: 16px; }
+.opt:hover:not(:disabled) { border-color: var(--cool); transform: translateY(-2px); }
+.opt:focus-visible, .btn:focus-visible { outline: 3px solid var(--cool); outline-offset: 2px; }
+.opt:disabled { cursor: default; }
+.opt.picked { border-color: var(--ink); }
+.opt.right { border-color: var(--calm); background: color-mix(in srgb, var(--calm) 14%, var(--paper)); }
+.opt.wrong { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 10%, var(--paper)); }
+.opt .big { display: block; font-family: var(--display); font-weight: 400; font-size: 26px; }
+
+.fb { border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; border: 2px solid var(--line); }
+.fb.good { border-color: var(--calm); }
+.fb.miss { border-color: var(--hot); }
+.fb.think { border-color: var(--cool); }
+.fb-head { font-weight: 900; font-size: 17px; }
+.fb.good .fb-head { color: var(--calm); }
+.fb.miss .fb-head { color: var(--hot); }
+.fb.think .fb-head { color: var(--cool); }
+.fb p { font-size: 15px; }
+
+.btn {
+  justify-self: stretch; border: none; border-radius: 14px; padding: 15px 20px;
+  background: var(--ink); color: var(--paper); font-weight: 900; font-size: 17px;
+}
+.btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--line); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row .btn { flex: 1 1 180px; }
+
+.list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.list li { display: flex; gap: 10px; align-items: baseline; }
+.list .n { font-family: var(--display); color: var(--cool); min-width: 1.6em; }
+.score-big { font-family: var(--display); font-size: clamp(48px, 14vw, 72px); line-height: 1; color: var(--calm); font-variant-numeric: tabular-nums; }
+.badge { display: inline-block; padding: 4px 12px; border-radius: 99px; background: var(--soft); font-weight: 900; font-size: 15px; }
+.stage-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.stage-table td { padding: 8px 4px; border-bottom: 1px solid var(--line); }
+.stage-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+
+@keyframes pop { from { transform: scale(.97); opacity: .6; } to { transform: none; opacity: 1; } }
+.card { animation: pop .25s ease; }
+@media (prefers-reduced-motion: reduce) { .card { animation: none; } .fill { transition: none; } .opt { transition: none; } }
+@media (max-width: 420px) { .opts.two .opt, .opts.three .opt { padding-inline: 6px; font-size: 15px; } }
+</style>
+
+<div class="wrap">
+  <div class="meter" aria-live="polite">
+    <div class="meter-row">
+      <span class="meter-label">イライラ温度</span>
+      <div class="tube"><div class="fill" id="fill"></div></div>
+      <span class="temp" id="temp">100℃</span>
+    </div>
+    <div class="steps" id="steps"></div>
+  </div>
+  <main id="app"></main>
+</div>
+
+<script>
+(function () {
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // ---------- stage data (from the worksheets) ----------
+  const LV = ['小', '中', '大'];
+  const words = [
+    ['イライラ', 0], ['ムカムカ', 0], ['おこ', 0], ['遺憾', 0], ['うざい', 1], ['カチンとくる', 1],
+    ['腹が立つ', 1], ['目くじらを立てる', 1], ['頭にくる', 1], ['憤る', 1], ['頭に血が上る', 2],
+    ['目を吊り上げる', 2], ['キレる', 2], ['激怒する', 2], ['爆発する', 2],
+    ['はらわたが煮えくり返る', 2], ['逆鱗に触れる', 2]
+  ];
+
+  function buildStages() {
+    return [
+      {
+        key: 'kihon', title: '怒りってどんな感情？',
+        story: 'アンガーマネジメントは「怒らないようになる」ことではありません。怒りと上手につきあう方法です。まずは怒りについてのイメージをチェック。',
+        rule: '正しいと思うほうを選ぼう。',
+        layout: 'two',
+        items: [
+          { q: '怒らない人はいる？', opts: [['いる', 'y'], ['いない', 'n']], ans: 'n', why: '怒りはだれにでもある自然な感情です。いつもおだやかに見える人も、怒りを感じていないわけではありません。' },
+          { q: '怒りはコントロールできない。', opts: [['○ そう思う', 'y'], ['× ちがう', 'n']], ans: 'n', why: '怒りとのつきあい方は練習で身につけられます。6秒待つ、深呼吸するなど、方法があります。' },
+          { q: '怒りっぽさは生まれつきだから変わらない。', opts: [['○ そう思う', 'y'], ['× ちがう', 'n']], ans: 'n', why: '考え方のくせや受け止め方は、トレーニングで変えていくことができます。' },
+          { q: '怒りは悪い感情だ。', opts: [['○ そう思う', 'y'], ['× ちがう', 'n']], ans: 'n', why: '怒りは自分や大切なものを守るための感情です。問題になるのは、怒りの表し方です。' },
+          { q: '怒りはみんな共通の、同じ感情だ。', opts: [['○ そう思う', 'y'], ['× ちがう', 'n']], ans: 'n', why: '同じ出来事でも、怒る人もいれば平気な人もいます。何にどれくらい怒るかは人それぞれです。' },
+          { q: '怒りはみんな持っている、当然の感情だ。', opts: [['○ そう思う', 'y'], ['× ちがう', 'n']], ans: 'y', why: 'そのとおり。だから「怒ってはいけない」と思わなくて大丈夫。大事なのは上手に扱うことです。' }
+        ]
+      },
+      {
+        key: 'kotoba', title: '怒りのことば、強さはどれくらい？',
+        story: '「ムカつく」「キレる」だけでなく、怒りを表すことばはたくさんあります。ことばを増やすと、自分の怒りの大きさに気づきやすくなります。',
+        rule: 'ことばの強さを「小・中・大」で選ぼう。感じ方は人それぞれなので、どれを選んでもOK。',
+        layout: 'three', free: true,
+        items: shuffle(words).slice(0, 6).map(([w, lv]) => ({
+          q: '「' + w + '」', sub: 'この怒りの強さは？',
+          opts: LV.map((l, i) => ['<span class="big">' + l + '</span>', String(i)]),
+          ans: null, ref: lv,
+          why: v => (Number(v) === lv
+            ? 'みんなの目安も「' + LV[lv] + '」。感覚が近いですね。'
+            : 'みんなの目安は「' + LV[lv] + '」。あなたは「' + LV[Number(v)] + '」と感じたんですね。ずれていても大丈夫、それが怒りの「人それぞれ」です。')
+        }))
+      },
+      {
+        key: 'kakawaru', title: '関わる？ 関わらない？',
+        story: '駅のホームで並んでいたら、横から人が割り込んできた。ムカつく！ でも、電車に乗る本来の目的は「目的地に時間通りに着くこと」。注意してトラブルになったら、その目的が果たせません。',
+        rule: '自分なら関わるか、関わらないかを選ぼう。正解はありません。選んだあとのヒントを読んでみよう。',
+        layout: 'two', free: true,
+        items: [
+          { q: '知らない人が電車内でポイ捨て', why: { k: '関わるなら、直接注意するより駅員さんに伝えるほうが安全です。', n: '知らない人とのトラブルは大きくなりがち。自分の目的を優先するのもひとつの選択です。' } },
+          { q: 'コンビニの列に割り込まれた', why: { k: '「列に並んでいますよ」と落ち着いて伝えれば、トラブルになりにくいです。', n: '待つのは数十秒かもしれません。イライラに時間を使わないのも上手なやり方です。' } },
+          { q: 'クラスメイトが授業中に寝ている', why: { k: '声をかけるなら、休み時間に「大丈夫？」と気づかう言い方がおすすめ。', n: '困るのは本人です。自分の授業に集中するのも大事な選択です。' } },
+          { q: '後輩の言葉遣いが汚い', why: { k: '先輩として伝えられる立場です。怒鳴らず「こう言うといいよ」と伝えてみよう。', n: '自分に向けたことばでなければ、気にしすぎないのも手です。' } },
+          { q: '芸能人の不倫のニュース', why: { k: 'あなたの生活に直接の関係はありません。そこに怒りを使うと疲れてしまうかも。', n: '自分の力の及ばないことから距離を置くのは、心を守る選択です。' } },
+          { q: '家族の食事中のマナーが気になる', why: { k: '毎日いっしょに過ごす相手です。責めずに「こうしてくれるとうれしい」と伝えてみよう。', n: '毎日のことなので、がまんし続けるとイライラがたまるかも。いつか伝える方法も考えてみよう。' } }
+        ].map(it => ({ q: it.q, opts: [['関わる', 'k'], ['関わらない', 'n']], ans: null, why: v => it.why[v] }))
+      },
+      {
+        key: 'kaerareru', title: '状況を変えられる？',
+        story: '楽しみにしていた修学旅行。でも台風で新幹線が運休、延期になりそう。天候や災害は、祈っても願っても変えられません。変えられないことを受け入れられないと、ずっとイライラが続きます。',
+        rule: '自分の行動しだいで、その状況を変えられるか選ぼう。',
+        layout: 'two',
+        items: [
+          ['天候', 'n', '天気は変えられません。でも、雨の日の過ごし方は自分で選べます。'],
+          ['人身事故', 'n', '電車が止まるのは変えられません。別のルートを調べる、連絡するなど、できることに目を向けよう。'],
+          ['天災', 'n', '地震や台風は止められません。備えをしておくことはできます。'],
+          ['交通渋滞', 'n', '渋滞そのものは変えられません。次から早めに出発する、などの工夫はできます。'],
+          ['部活の先輩の性格が合わない', 'n', '人の性格は変えられません。でも、自分の関わり方や受け止め方は変えられます。'],
+          ['好きじゃない時間割', 'n', '時間割は決まっています。その日の楽しみを見つけるなど、とらえ方を変えてみよう。'],
+          ['じゃんけんで決めた掃除当番', 'n', 'みんなで納得して決めたことです。早く終わらせるコツを考えるほうが気分が軽くなります。'],
+          ['入試の結果', 'n', '出た結果は変えられません。ただし、受ける前の準備は自分しだいです。'],
+          ['体重', 'y', '食事や運動など、自分の行動で変えていけます。'],
+          ['成績', 'y', '勉強の仕方や時間を工夫すれば、変えていけます。']
+        ].map(([q, a, why]) => ({ q, opts: [['変えられる', 'y'], ['変えられない', 'n']], ans: a, why }))
+      },
+      {
+        key: 'beki', title: '自分の「べき」を探そう',
+        story: '私たちを怒らせるものは、実は自分の中にあります。その正体は「〜するべき」という思い。自分の「べき」がわかると、どんなときに怒りやすいかがわかります。',
+        rule: 'この出来事で怒った人の中にある「べき」はどれ？',
+        layout: 'one',
+        items: [
+          { q: 'テスト前なのに、しつこく遊びに誘われた', opts: ['テスト前は勉強するべき', '友達とは毎日遊ぶべき', '誘われたら必ず行くべき'], why: 'ワークシートの例と同じです。「テスト前は勉強するべき」と思っているから、イラッとするんですね。' },
+          { q: '校則を破っている人を見て、イラッとした', opts: ['校則は守るべき', '目立たないようにするべき', '先生の前ではおとなしくするべき'], why: '「校則は守るべき」と考えている人ほど、違反が気になります。' },
+          { q: '友達のやさしいうそに、ムカッとした', opts: ['うそをつくべきではない', '友達には気をつかうべき', '話はおもしろくするべき'], why: 'どんなときも「うそをつくべきではない」と思っていると、やさしいうそにも反応します。' },
+          { q: '待ち合わせに友達が10分遅れてきた', opts: ['時間は守るべき', '遅れたらおごるべき', '待ち合わせは駅にするべき'], why: '「時間は守るべき」。何分までなら許せるかは、人によって違います。' },
+          { q: '後輩があいさつをしてくれなかった', opts: ['後輩は先輩にあいさつするべき', '先輩は後輩にやさしくするべき', 'あいさつは小さな声でするべき'], why: '「後輩はあいさつするべき」が自分の中にあるとわかれば、伝え方も考えられます。' },
+          { q: '家族が自分のおやつを勝手に食べた', opts: ['人の物は勝手に食べるべきではない', 'おやつは分け合うべき', 'おやつは早く食べるべき'], why: '「人の物は勝手に食べるべきではない」。自分の「べき」を言葉にすると、相手に伝えやすくなります。' }
+        ].map(it => {
+          const right = it.opts[0];
+          return { q: it.q, opts: shuffle(it.opts).map(o => [o, o]), ans: right, why: it.why };
+        })
+      },
+      {
+        key: 'moshika', title: '友達の考えを想像してみよう',
+        story: '友達のSNSに体育祭の写真がアップされていた。友達はばっちり盛れているのに、私は目が半開き。最悪！ でも「絶対わざとだ」と決めつけると、仕返しを考えたり距離を置いたりして、余計にこじれてしまいます。',
+        rule: 'この考えは「もしかしたら」の想像？ それとも「決めつけ」？',
+        layout: 'two',
+        items: [
+          ['絶対わざとに違いない', 'x'],
+          ['もしかしたら、友達は他の人の表情はあまり見ていなかったのかもしれない', 'm'],
+          ['どうせ自分がよければいいんでしょ', 'x'],
+          ['もしかしたら、みんなが楽しそうな1枚を選んだつもりだったのかもしれない', 'm'],
+          ['私のことをバカにしているんだ', 'x'],
+          ['もしかしたら、急いでいて写真をよく確認しなかったのかもしれない', 'm'],
+          ['もう二度と一緒に写真を撮らない', 'x'],
+          ['もしかしたら、私の半目に気づいていないのかもしれない', 'm']
+        ].map(([q, a]) => ({
+          q, opts: [['もしかしたら', 'm'], ['決めつけ', 'x']], ans: a,
+          why: a === 'm' ? '相手に悪気はなかったかも、と考えると気持ちが少し落ち着きます。「消してほしいな」と伝えることもできますね。' : '相手の気持ちを決めつけています。こう考えると、怒りが大きくなりやすいです。'
+        }))
+      }
+    ];
+  }
+
+  // ---------- state ----------
+  let S;
+  const app = document.getElementById('app');
+  const totalItems = () => S.stages.reduce((n, s) => n + s.items.length, 0);
+
+  function reset() {
+    S = { stages: buildStages(), si: -1, ii: 0, score: 0, answered: false, results: [] };
+    S.stages.forEach(() => S.results.push({ got: 0, n: 0 }));
+    renderSteps(); updateTemp(); renderTitle();
+  }
+
+  function updateTemp() {
+    const t = Math.round(100 - 64 * (S.score / totalItems()));
+    document.getElementById('temp').textContent = t + '℃';
+    document.getElementById('fill').style.width = t + '%';
+  }
+
+  function renderSteps() {
+    const el = document.getElementById('steps');
+    el.innerHTML = S.stages.map((_, i) => '<span class="step ' + (i < S.si ? 'done' : i === S.si ? 'now' : '') + '"></span>').join('');
+  }
+
+  function focusFirst(sel) { const b = app.querySelector(sel); if (b) b.focus({ preventScroll: true }); }
+
+  function renderTitle() {
+    app.innerHTML =
+      '<section class="card">' +
+      '<span class="eyebrow">アンガーマネジメント ワーク × ゲーム</span>' +
+      '<h1>イライラ温度計<br><span class="hot">クエスト</span></h1>' +
+      '<p>いまのイライラ温度は <b>100℃</b>。6つのステージでワークに答えて、こころの温度を下げていこう。</p>' +
+      '<ol class="list">' + S.stages.map((s, i) => '<li><span class="n">' + (i + 1) + '</span><span>' + esc(s.title) + '</span></li>').join('') + '</ol>' +
+      '<p class="qsub">正解のないステージもあります。そのステージは、答えるだけで温度が下がります。</p>' +
+      '<button class="btn" id="start">スタート</button>' +
+      '</section>';
+    document.getElementById('start').onclick = () => { S.si = 0; renderIntro(); };
+  }
+
+  function renderIntro() {
+    const s = S.stages[S.si];
+    renderSteps();
+    app.innerHTML =
+      '<section class="card">' +
+      '<span class="eyebrow">ステージ ' + (S.si + 1) + ' / ' + S.stages.length + (s.free ? '　正解なし' : '') + '</span>' +
+      '<h2>' + esc(s.title) + '</h2>' +
+      '<p class="story">' + esc(s.story) + '</p>' +
+      '<p class="rule">' + esc(s.rule) + '</p>' +
+      '<button class="btn" id="go">はじめる</button>' +
+      '</section>';
+    document.getElementById('go').onclick = () => { S.ii = 0; renderItem(); };
+    focusFirst('#go');
+  }
+
+  function renderItem() {
+    const s = S.stages[S.si], it = s.items[S.ii];
+    S.answered = false;
+    const cls = s.layout === 'two' ? 'opts two' : s.layout === 'three' ? 'opts three' : 'opts';
+    app.innerHTML =
+      '<section class="card">' +
+      '<span class="count">ステージ ' + (S.si + 1) + '　' + (S.ii + 1) + ' / ' + s.items.length + '</span>' +
+      '<p class="q">' + esc(it.q) + '</p>' +
+      (it.sub ? '<p class="qsub">' + esc(it.sub) + '</p>' : '') +
+      '<div class="' + cls + '">' +
+      it.opts.map(([label, v], i) => '<button class="opt' + (s.layout === 'one' ? ' wide' : '') + '" id="opt' + i + '" data-v="' + esc(v) + '">' + (s.key === 'kotoba' ? label : esc(label)) + '</button>').join('') +
+      '</div><div id="fbslot"></div></section>';
+    app.querySelectorAll('.opt').forEach(b => b.onclick = () => answer(b.dataset.v, b));
+    focusFirst('.opt');
+  }
+
+  function answer(v, btn) {
+    if (S.answered) return;
+    S.answered = true;
+    const s = S.stages[S.si], it = s.items[S.ii];
+    const free = it.ans === null;
+    const ok = free || v === it.ans;
+    if (ok) { S.score++; S.results[S.si].got++; }
+    S.results[S.si].n++;
+    updateTemp();
+    app.querySelectorAll('.opt').forEach(b => {
+      b.disabled = true;
+      if (free) { if (b === btn) b.classList.add('picked'); }
+      else if (b.dataset.v === it.ans) b.classList.add('right');
+      else if (b === btn) b.classList.add('wrong');
+    });
+    const why = typeof it.why === 'function' ? it.why(v) : it.why;
+    const head = free ? 'ヒント' : ok ? '○ せいかい！ 温度が下がった' : '× ざんねん';
+    const kind = free ? 'think' : ok ? 'good' : 'miss';
+    const last = S.ii === s.items.length - 1;
+    document.getElementById('fbslot').outerHTML =
+      '<div class="fb ' + kind + '" role="status"><span class="fb-head">' + head + '</span><p>' + esc(why) + '</p></div>' +
+      '<button class="btn" id="next">' + (last ? 'ステージ結果へ' : 'つぎへ') + '</button>';
+    const nx = document.getElementById('next');
+    nx.onclick = () => { if (last) renderStageEnd(); else { S.ii++; renderItem(); } };
+    nx.focus({ preventScroll: true });
+    nx.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  const LESSON = {
+    kihon: '怒りはだれにでもある自然な感情。悪いものではなく、上手に扱えばいい。',
+    kotoba: '怒りのことばを増やすと、自分の怒りの大きさに気づけるようになる。',
+    kakawaru: '「本来の目的は何？」と考えると、関わるかどうかを選べる。',
+    kaerareru: '変えられないことは受け入れて、変えられることに力を使おう。',
+    beki: '怒りの正体は自分の中の「べき」。知っておくと、上手に伝えられる。',
+    moshika: '「もしかしたら」と考えると、決めつけによるこじれを防げる。'
+  };
+
+  function renderStageEnd() {
+    const s = S.stages[S.si], r = S.results[S.si];
+    const last = S.si === S.stages.length - 1;
+    app.innerHTML =
+      '<section class="card">' +
+      '<span class="eyebrow">ステージ ' + (S.si + 1) + ' クリア</span>' +
+      '<h2>' + esc(s.title) + '</h2>' +
+      '<p><span class="badge">' + (s.free ? r.n + '問 答えた' : r.got + ' / ' + r.n + ' 正解') + '</span></p>' +
+      '<p class="story"><b>ポイント</b><br>' + esc(LESSON[s.key]) + '</p>' +
+      '<button class="btn" id="cont">' + (last ? '最終結果を見る' : 'つぎのステージへ') + '</button>' +
+      '</section>';
+    document.getElementById('cont').onclick = () => { if (last) { S.si = S.stages.length; renderSteps(); renderFinal(); } else { S.si++; renderIntro(); } };
+    focusFirst('#cont');
+  }
+
+  function renderFinal() {
+    const t = Math.round(100 - 64 * (S.score / totalItems()));
+    const rank = t <= 40 ? ['おだやかマスター', 'イライラと上手につきあえています。'] :
+                 t <= 55 ? ['クールダウン名人', 'あと少しで達人。間違えたところをもう一度見直してみよう。'] :
+                           ['ウォームアップ中', 'ポイントを読み返して、もう一度チャレンジしてみよう。'];
+    app.innerHTML =
+      '<section class="card">' +
+      '<span class="eyebrow">最終結果</span>' +
+      '<div class="score-big">' + t + '℃</div>' +
+      '<h2>' + rank[0] + '</h2><p>' + rank[1] + '</p>' +
+      '<table class="stage-table"><tbody>' + S.stages.map((s, i) => {
+        const r = S.results[i];
+        return '<tr><td>' + (i + 1) + '. ' + esc(s.title) + '</td><td>' + (s.free ? '答えた' : r.got + ' / ' + r.n) + '</td></tr>';
+      }).join('') + '</tbody></table>' +
+      '<div class="story"><b>今日のまとめ</b><ol class="list" style="margin-top:8px">' +
+      S.stages.map((s, i) => '<li><span class="n">' + (i + 1) + '</span><span>' + esc(LESSON[s.key]) + '</span></li>').join('') +
+      '</ol></div>' +
+      '<p class="qsub">次はワークシートに、自分の「最近怒った出来事」と「べき」を書いてみよう。</p>' +
+      '<div class="row"><button class="btn" id="again">もう一度あそぶ</button></div>' +
+      '</section>';
+    document.getElementById('again').onclick = reset;
+    focusFirst('#again');
+  }
+
+  reset();
+})();
+</script>
