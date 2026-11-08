@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="OKスタンプ">
+  <path d="M100 14 C 150 14, 186 50, 186 100 C 186 150, 150 186, 100 186 C 50 186, 14 150, 14 100 C 14 50, 50 14, 100 14 Z" fill="none" stroke="#2F6B62" stroke-width="8"/>
+  <path d="M100 30 C 140 30, 170 60, 170 100 C 170 140, 140 170, 100 170 C 60 170, 30 140, 30 100 C 30 60, 60 30, 100 30 Z" fill="none" stroke="#2F6B62" stroke-width="3"/>
+  <text x="100" y="124" text-anchor="middle" font-family="'Zen Maru Gothic','Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif" font-weight="700" font-size="68" fill="#2F6B62" transform="rotate(-8 100 100)">OK</text>
+</svg>

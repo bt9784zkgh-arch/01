@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="ステップ1 クリアの メダル（ハート）">
+  <path d="M120 14 C 178 14, 226 62, 226 120 C 226 178, 178 226, 120 226 C 62 226, 14 178, 14 120 C 14 62, 62 14, 120 14 Z" fill="#FBF7EF" stroke="#2F6B62" stroke-width="10"/>
+  <path d="M120 36 C 166 36, 204 74, 204 120 C 204 166, 166 204, 120 204 C 74 204, 36 166, 36 120 C 36 74, 74 36, 120 36 Z" fill="none" stroke="#2F6B62" stroke-width="3" stroke-dasharray="6 8"/>
+  <path d="M120 172 C 92 152, 66 132, 68 104 C 70 84, 88 74, 102 76 C 110 78, 116 84, 120 92 C 124 84, 130 78, 140 76 C 154 74, 172 84, 172 104 C 172 132, 148 152, 120 172 Z" fill="#F6D9CF" stroke="#33302C" stroke-width="5"/><text x="120" y="70" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="26" fill="#2F6B62">1</text>
+</svg>

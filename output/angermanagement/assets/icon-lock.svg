@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="かぎ（かえられない）">
+  <path d="M38 54 L 38 38 C 38 22, 82 22, 82 38 L 82 54" fill="none" stroke="#33302C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 54 L 96 53 L 97 106 L 23 107 Z" fill="#C9CCD1" stroke="#33302C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60 72 L 60 88" fill="none" stroke="#33302C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="72" r="6" fill="#33302C"/>
+</svg>

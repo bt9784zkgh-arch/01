@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="たのしみの 修学旅行（しゅうがくりょこう）の バスと、台風">
+  <path d="M30 120 L 210 118 C 226 118, 232 128, 232 142 L 232 186 L 30 188 Z" fill="#F1D88A" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M46 132 L 86 132 L 86 158 L 46 158 Z M100 132 L 140 132 L 140 158 L 100 158 Z M154 132 L 194 132 L 194 158 L 154 158 Z" fill="#FBF7EF" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="72" cy="190" r="16" fill="#5E5750" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="192" cy="190" r="16" fill="#5E5750" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(250 66) scale(.5)"><path d="M0 0 C 0 -16, 20 -20, 26 -6 C 34 14, 12 36, -10 30 C -40 22, -44 -20, -16 -36 C 20 -56, 66 -28, 62 14 C 58 56, 8 80, -32 64" fill="none" stroke="#2F5F8A" stroke-width="14" stroke-linecap="round"/></g>
+</svg>

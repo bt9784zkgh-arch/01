@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="地震（じしん）で 家が ゆれる">
+  <g transform="rotate(-4 160 150)">
+  <path d="M100 110 L 160 62 L 222 110 Z" fill="#EFAE9B" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M112 110 L 210 110 L 210 190 L 112 190 Z" fill="#FBF7EF" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M146 150 L 176 150 L 176 190 L 146 190 Z" fill="#F2BC85" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <path d="M70 120 C 62 136, 62 152, 70 168 M54 112 C 42 136, 42 156, 54 178 M250 120 C 258 136, 258 152, 250 168 M266 112 C 278 136, 278 156, 266 178" fill="none" stroke="#5E5750" stroke-width="5" stroke-linecap="round"/>
+  <path d="M30 206 C 80 200, 120 212, 160 204 C 200 198, 250 210, 292 204" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

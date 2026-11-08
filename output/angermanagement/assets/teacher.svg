@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 320" role="img" aria-label="ほけんしつの せんせい">
+  <!-- body: cardigan -->
+  <path d="M40 318 C 40 250, 70 214, 130 212 C 190 214, 222 250, 222 318 Z" fill="#2F6B62" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M108 214 L 130 262 L 154 214" fill="#FBF7EF" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M130 262 L 130 318" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="142" cy="282" r="4" fill="#33302C"/><circle cx="142" cy="304" r="4" fill="#33302C"/>
+  <!-- name tag -->
+  <path d="M168 252 L 200 250 L 201 272 L 169 274 Z" fill="#FBF7EF" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- neck -->
+  <path d="M116 190 L 116 214 L 146 214 L 146 190" fill="#F7E3C8" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- hair back -->
+  <path d="M60 120 C 52 60, 90 26, 132 28 C 178 30, 208 64, 202 122 C 200 150, 196 168, 188 180 L 76 182 C 66 166, 62 146, 60 120 Z" fill="#5E4A3C" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- face -->
+  <path d="M82 112 C 82 72, 104 58, 132 58 C 162 58, 182 74, 182 112 C 182 152, 160 186, 132 186 C 104 186, 82 152, 82 112 Z" fill="#F7E3C8" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- bangs -->
+  <path d="M80 104 C 92 76, 116 62, 140 62 C 160 64, 176 78, 184 100 C 168 92, 150 82, 136 70 C 124 86, 104 98, 80 104 Z" fill="#5E4A3C" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- eyes / brows / mouth -->
+  <path d="M102 112 C 106 108, 114 108, 118 112 M146 112 C 150 108, 158 108, 162 112" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="110" cy="128" r="5.5" fill="#33302C"/><circle cx="154" cy="128" r="5.5" fill="#33302C"/>
+  <path d="M116 156 C 124 164, 140 164, 148 156" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="98" cy="148" r="8" fill="#EFAE9B" opacity=".55"/><circle cx="166" cy="148" r="8" fill="#EFAE9B" opacity=".55"/>
+  <!-- glasses -->
+  <path d="M96 128 C 96 116, 124 116, 124 128 C 124 140, 96 140, 96 128 Z M140 128 C 140 116, 168 116, 168 128 C 168 140, 140 140, 140 128 Z M124 126 L 140 126" fill="none" stroke="#33302C" stroke-width="3.5"/>
+</svg>

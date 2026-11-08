@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="本を よむ 子と、てんすうが 上がる やじるし">
+  <path d="M40 120 C 38 90, 56 74, 80 74 C 104 74, 122 90, 120 120 C 120 146, 104 162, 80 162 C 56 162, 40 146, 40 120 Z" fill="#F7E3C8" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M38 112 C 44 84, 62 72, 82 72 C 104 74, 118 88, 122 110 C 102 104, 88 94, 80 84 C 70 98, 56 108, 38 112 Z" fill="#33302C"/>
+  <circle cx="68" cy="126" r="4.5" fill="#33302C"/><circle cx="94" cy="126" r="4.5" fill="#33302C"/>
+  <path d="M40 172 L 80 186 L 120 172 L 120 214 L 80 226 L 40 214 Z" fill="#FBF7EF" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M80 186 L 80 226" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M170 196 L 196 160 L 222 176 L 276 92" fill="none" stroke="#2F6B62" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M250 92 L 280 86 L 282 118" fill="none" stroke="#2F6B62" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

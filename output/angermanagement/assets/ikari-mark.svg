@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 190" role="img" aria-label="いかりマーク（ハートの なかの 小さな ほのお）">
+  <path d="M100 172 C 58 142, 20 112, 24 72 C 27 42, 52 26, 74 30 C 88 33, 96 42, 101 54 C 106 41, 116 31, 131 29 C 156 27, 178 46, 176 76 C 173 114, 138 144, 100 172 Z" fill="#F6D9CF" stroke="#33302C" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M60 58 C 55 66, 52 74, 53 84" fill="none" stroke="#FBF7EF" stroke-width="7" stroke-linecap="round"/>
+  <g transform="translate(101 104) scale(1.05)">
+    <path d="M0 -42 C 6 -30, 24 -16, 23 6 C 22 24, 11 34, 0 34 C -12 34, -23 24, -22 7 C -21 -6, -12 -12, -8 -22 C -4 -14, -2 -10, 2 -8 C 4 -20, 2 -30, 0 -42 Z" fill="#E08A72" stroke="#A0432E" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M0 -6 C 6 2, 10 10, 9 18 C 8 26, 4 29, 0 29 C -5 29, -9 25, -9 18 C -9 10, -4 6, 0 -6 Z" fill="#F1D88A"/>
+  </g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="こまった顔（中くらい）">
+  <path d="M80 12 C 120 11, 149 40, 148 80 C 147 120, 119 149, 80 148 C 40 148, 12 121, 12 80 C 12 40, 41 12, 80 12 Z" fill="#F7E3C8" stroke="#33302C" stroke-width="5"/>
+  <circle cx="57" cy="78" r="7" fill="#33302C"/><circle cx="103" cy="78" r="7" fill="#33302C"/>
+  <path d="M44 56 C 54 60, 62 63, 68 66 M92 66 C 98 63, 106 60, 116 56" stroke="#33302C" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M60 116 C 70 108, 90 108, 100 116" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round"/>
+  
+</svg>

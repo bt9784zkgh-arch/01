@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="ほのおが 大きいから 小さく なる">
+  <g transform="translate(60 104) scale(1.6)"><path d="M0 -42 C 6 -30, 24 -16, 23 6 C 22 24, 11 34, 0 34 C -12 34, -23 24, -22 7 C -21 -6, -12 -12, -8 -22 C -4 -14, -2 -10, 2 -8 C 4 -20, 2 -30, 0 -42 Z" fill="#EFAE9B" stroke="#A0432E" stroke-width="3"/></g>
+  <path d="M120 104 L 170 104 M156 90 L 172 104 L 156 118" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(210 120) scale(1)"><path d="M0 -42 C 6 -30, 24 -16, 23 6 C 22 24, 11 34, 0 34 C -12 34, -23 24, -22 7 C -21 -6, -12 -12, -8 -22 C -4 -14, -2 -10, 2 -8 C 4 -20, 2 -30, 0 -42 Z" fill="#F1D88A" stroke="#7A5C0E" stroke-width="4"/></g>
+  <g transform="translate(280 136) scale(.55)"><path d="M0 -42 C 6 -30, 24 -16, 23 6 C 22 24, 11 34, 0 34 C -12 34, -23 24, -22 7 C -21 -6, -12 -12, -8 -22 C -4 -14, -2 -10, 2 -8 C 4 -20, 2 -30, 0 -42 Z" fill="#A9C6E3" stroke="#2F5F8A" stroke-width="6"/></g>
+</svg>

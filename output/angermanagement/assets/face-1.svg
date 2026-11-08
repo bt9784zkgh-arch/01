@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="すこし むっとした顔（小さい）">
+  <path d="M80 12 C 120 11, 149 40, 148 80 C 147 120, 119 149, 80 148 C 40 148, 12 121, 12 80 C 12 40, 41 12, 80 12 Z" fill="#F7E3C8" stroke="#33302C" stroke-width="5"/>
+  <circle cx="57" cy="78" r="7" fill="#33302C"/><circle cx="103" cy="78" r="7" fill="#33302C"/>
+  <path d="M44 60 C 52 58, 62 58, 68 60 M92 60 C 98 58, 108 58, 116 60" stroke="#33302C" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M60 112 L 100 112" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round"/>
+  
+</svg>

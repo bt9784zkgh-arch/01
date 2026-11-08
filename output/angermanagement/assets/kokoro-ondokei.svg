@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 760" role="img" aria-label="こころの おんどけい（いかりメーター）。下が 小さい、まんなかが 中くらい、上が 大きい">
+  <defs>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="3" fill="#2F5F8A"/></pattern>
+    <pattern id="stripe" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M-5 5 L5 -5 M0 20 L20 0 M15 25 L25 15" stroke="#7A5C0E" stroke-width="3"/></pattern>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M0 10 H20 M10 0 V20" stroke="#A0432E" stroke-width="3"/></pattern>
+    <clipPath id="tube"><path d="M78 40 C 78 18, 142 18, 142 40 L 143 600 L 77 600 Z"/></clipPath>
+  </defs>
+  <!-- zones -->
+  <g clip-path="url(#tube)">
+    <rect x="70" y="420" width="80" height="190" fill="#A9C6E3"/><rect x="70" y="420" width="80" height="190" fill="url(#dots)" opacity=".5"/>
+    <rect x="70" y="230" width="80" height="190" fill="#F1D88A"/><rect x="70" y="230" width="80" height="190" fill="url(#stripe)" opacity=".5"/>
+    <rect x="70" y="20" width="80" height="210" fill="#EFAE9B"/><rect x="70" y="20" width="80" height="210" fill="url(#grid)" opacity=".5"/>
+  </g>
+  <!-- bulb -->
+  <circle cx="110" cy="660" r="72" fill="#A9C6E3" stroke="#33302C" stroke-width="6"/>
+  <path d="M74 640 C 78 622, 88 612, 100 608" fill="none" stroke="#FBF7EF" stroke-width="9" stroke-linecap="round"/>
+  <!-- tube outline (hand wobble) -->
+  <path d="M78 600 L 77 300 C 77 200, 79 120, 78 40 C 79 16, 141 15, 142 41 C 141 140, 143 260, 143 420 L 142 600" fill="none" stroke="#33302C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- ticks -->
+  <g stroke="#33302C" stroke-width="5" stroke-linecap="round">
+    <path d="M150 420 L 176 421"/><path d="M150 230 L 177 229"/>
+    <path d="M150 515 L 166 515"/><path d="M150 325 L 165 326"/><path d="M150 125 L 166 124"/>
+  </g>
+  <!-- level numbers as shapes: 1 dot / 2 dots / 3 dots on left -->
+  <g fill="#33302C"><circle cx="44" cy="515" r="8"/>
+    <circle cx="44" cy="312" r="8"/><circle cx="44" cy="338" r="8"/>
+    <circle cx="44" cy="98" r="8"/><circle cx="44" cy="124" r="8"/><circle cx="44" cy="150" r="8"/></g>
+</svg>

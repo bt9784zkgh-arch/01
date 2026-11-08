@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="ステップ3 クリアの メダル（て）">
+  <path d="M120 14 C 178 14, 226 62, 226 120 C 226 178, 178 226, 120 226 C 62 226, 14 178, 14 120 C 14 62, 62 14, 120 14 Z" fill="#FBF7EF" stroke="#2F6B62" stroke-width="10"/>
+  <path d="M120 36 C 166 36, 204 74, 204 120 C 204 166, 166 204, 120 204 C 74 204, 36 166, 36 120 C 36 74, 74 36, 120 36 Z" fill="none" stroke="#2F6B62" stroke-width="3" stroke-dasharray="6 8"/>
+  <g transform="translate(70 66) scale(.85)"><path d="M38 64 L 36 30 C 36 22, 47 22, 47 30 L 48 56 L 49 20 C 49 12, 60 12, 60 20 L 61 54 L 63 24 C 63 16, 74 16, 74 24 L 74 58 L 77 34 C 78 27, 88 28, 87 35 L 85 74 C 84 96, 72 108, 56 108 C 42 108, 32 100, 26 88 L 14 66 C 11 59, 20 54, 25 60 Z" fill="#F2BC85" stroke="#33302C" stroke-width="6" stroke-linejoin="round"/></g><text x="178" y="92" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="26" fill="#2F6B62">3</text>
+</svg>

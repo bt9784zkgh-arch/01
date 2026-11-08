@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="しんこきゅう する 人。ほのおが 小さく なる">
+  <path d="M40 120 C 38 82, 60 60, 90 60 C 120 60, 142 82, 140 120 C 140 158, 120 180, 90 180 C 60 180, 40 158, 40 120 Z" fill="#F7E3C8" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M66 112 C 70 108, 76 108, 80 112 M100 112 C 104 108, 110 108, 114 112" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="90" cy="146" r="8" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M140 140 C 170 130, 190 150, 216 138 M146 160 C 176 156, 196 172, 220 162" fill="none" stroke="#2F5F8A" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 12"/>
+  <g transform="translate(260 112) scale(.9)"><path d="M0 -42 C 6 -30, 24 -16, 23 6 C 22 24, 11 34, 0 34 C -12 34, -23 24, -22 7 C -21 -6, -12 -12, -8 -22 C -4 -14, -2 -10, 2 -8 C 4 -20, 2 -30, 0 -42 Z" fill="#EFAE9B" stroke="#A0432E" stroke-width="4"/></g>
+  <path d="M252 166 L 268 166 L 260 180 Z" fill="#33302C"/>
+  <g transform="translate(260 210) scale(.4)"><path d="M0 -42 C 6 -30, 24 -16, 23 6 C 22 24, 11 34, 0 34 C -12 34, -23 24, -22 7 C -21 -6, -12 -12, -8 -22 C -4 -14, -2 -10, 2 -8 C 4 -20, 2 -30, 0 -42 Z" fill="#A9C6E3" stroke="#2F5F8A" stroke-width="6"/></g>
+</svg>

@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="台風（たいふう）">
+  <path d="M160 120 C 160 104, 180 100, 186 114 C 194 134, 172 156, 150 150 C 120 142, 116 100, 144 84 C 180 64, 226 92, 222 134 C 218 176, 168 200, 128 184 C 80 164, 74 98, 110 62 C 142 30, 200 34, 230 60" fill="none" stroke="#2F5F8A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M30 70 C 50 64, 70 76, 90 70 M240 190 C 260 184, 278 196, 298 190 M24 170 C 44 164, 62 176, 80 170" fill="none" stroke="#5E5750" stroke-width="5" stroke-linecap="round"/>
+</svg>

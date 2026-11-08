@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="ハートの いろが 赤から 青に かわる。おんがく・しんこきゅうで きぶんを かえる">
+  <g transform="translate(70 110)"><path d="M0 50 C -28 30, -50 12, -48 -12 C -46 -30, -30 -40, -16 -38 C -8 -36, -3 -30, 0 -22 C 3 -30, 8 -36, 16 -38 C 30 -40, 46 -30, 48 -12 C 50 12, 28 30, 0 50 Z" fill="#EFAE9B" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <path d="M130 110 C 150 100, 170 100, 190 110 M178 98 L 192 110 L 178 122" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(250 110)"><path d="M0 50 C -28 30, -50 12, -48 -12 C -46 -30, -30 -40, -16 -38 C -8 -36, -3 -30, 0 -22 C 3 -30, 8 -36, 16 -38 C 30 -40, 46 -30, 48 -12 C 50 12, 28 30, 0 50 Z" fill="#A9C6E3" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g transform="translate(110 190)"><path d="M10 0 L 10 30 M10 0 C 18 2, 24 6, 26 12" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="4" cy="32" rx="8" ry="6" fill="#33302C"/></g>
+  <path d="M176 196 C 190 188, 204 204, 218 196 M180 214 C 194 206, 208 222, 222 214" fill="none" stroke="#2F5F8A" stroke-width="5" stroke-linecap="round"/>
+</svg>

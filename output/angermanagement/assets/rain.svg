@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="雨雲と かさ">
+  <path d="M60 100 C 50 70, 80 50, 104 62 C 112 36, 160 30, 174 58 C 196 44, 236 56, 232 88 C 256 92, 258 126, 232 128 L 72 128 C 44 128, 40 102, 60 100 Z" fill="#C9CCD1" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke="#2F5F8A" stroke-width="5" stroke-linecap="round"><path d="M90 146 L 82 166"/><path d="M140 146 L 132 166"/><path d="M190 146 L 182 166"/><path d="M110 180 L 102 200"/></g>
+  <path d="M200 196 C 206 160, 280 160, 288 196 Z" fill="#F2BC85" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M244 196 L 244 228 C 244 236, 232 236, 232 228" fill="none" stroke="#33302C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
