@@ -496,7 +496,7 @@
     var drop = makeDrop(mats, C.lv1);
     var items = [
       { o: heart, x: -0.35, y: 0.05, z: 0.3, s: 1.45, delay: 0.0, spin: 0.35 },
-      { o: drop, x: 1.35, y: -0.2, z: 0.2, s: 1.0, delay: 0.35, spin: 0.3, isDrop: true }
+      { o: drop, x: 1.5, y: -0.2, z: 0.2, s: 1.0, delay: 0.35, spin: 0.3, isDrop: true }
     ];
     items.forEach(function (it) { pivot.add(it.o); });
     var flameCol = new THREE.Color();
