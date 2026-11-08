@@ -1,0 +1,11 @@
+# 全188枚はチェック用。リポジトリには代表的なものだけ入れる
+*.png
+!fhd-01-title.png
+!fhd-03-q1-1-answered.png
+!fhd-10-q2-2-answered.png
+!fhd-13-model-2まとめ.png
+!fhd-17-q3-1-answered.png
+!fhd-22-clear-3.png
+!fhd-23-result.png
+!fhd-99-rest.png
+!check-*.png
