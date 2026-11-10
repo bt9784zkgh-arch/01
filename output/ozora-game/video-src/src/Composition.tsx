@@ -393,7 +393,7 @@ export const SCENES: SceneDef[] = [
     heading: "ことばの おくの 気持ち",
     shots: [
       { src: "s1_3_mondai1", from: v(1.0, 0.5, 0.5), to: v(1.12, 0.5, 0.6) },
-      { src: "s1_4_seikai1", from: v(1.12, 0.45, 0.6), to: v(1.2, 0.4, 0.65) },
+      { src: "s1_4_seikai1", from: v(1.12, 0.5, 0.6), to: v(1.2, 0.45, 0.65) },
     ],
     captions: [
       { lines: ["きつい ことばの 下にある", "気持ちを 2つから えらぶ"], start: 0.3, end: 6.8 },
@@ -407,7 +407,7 @@ export const SCENES: SceneDef[] = [
     heading: "変えられる？ 変えられない？",
     shots: [
       { src: "s2_3_mondai1", from: v(1.0, 0.5, 0.5), to: v(1.12, 0.5, 0.55) },
-      { src: "s2_4_seikai1", from: v(1.12, 0.5, 0.6), to: v(1.18, 0.55, 0.62) },
+      { src: "s2_4_seikai1", from: v(1.12, 0.5, 0.55), to: v(1.18, 0.55, 0.6) },
     ],
     captions: [
       { lines: ["カードを「手のはこ」と", "「くものはこ」に 分ける"], start: 0.3, end: 6.8 },
@@ -421,7 +421,7 @@ export const SCENES: SceneDef[] = [
     heading: "こまった とき、どうする？",
     shots: [
       { src: "s3_3_mondai1", from: v(1.0, 0.5, 0.5), to: v(1.1, 0.5, 0.55) },
-      { src: "s3_4_seikai1", from: v(1.12, 0.5, 0.6), to: v(1.2, 0.45, 0.62) },
+      { src: "s3_4_seikai1", from: v(1.1, 0.5, 0.55), to: v(1.18, 0.45, 0.6) },
     ],
     captions: [
       { lines: ["こまった 場面で、よい 行動を", "3つから えらぶ"], start: 0.3, end: 3.6 },
