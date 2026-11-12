@@ -30,12 +30,14 @@
   .guide { height: 250px; }
   /* ステップ2: 箱に入った 用事シール */
   .choice--box .box-drop {
-    position: absolute; right: 18px; bottom: 74px;
-    padding: 6px 10px 2px; background: var(--c-card);
-    border: 4px solid var(--c-ink); border-radius: var(--radius-label);
-    transform: rotate(3deg);
+    position: absolute; right: 10px; bottom: 8px; max-width: 212px;
+    padding: 2px 8px; background: var(--c-card);
+    border: 3px solid var(--c-ink); border-radius: var(--radius-label);
+    transform: rotate(2deg);
   }
-  .choice--box .box-drop .task-chip img { width: 64px; height: 64px; }
+  .choice--box .box-drop .task-chip { flex-direction: row; gap: 6px; white-space: normal; text-align: left; }
+  .choice--box .box-drop .task-chip img { width: 40px; height: 40px; flex: none; }
+  .choice--box .box-drop .label { font-size: var(--fs-small); line-height: 1.2; }
   /* おてほん中の選択肢は押せない（見るだけ） */
   .choice:disabled:not(.is-dimmed), .day-cell:disabled:not(.is-dimmed) { cursor: default; }
   .choice:disabled:hover, button.day-cell:disabled:hover { transform: none; }

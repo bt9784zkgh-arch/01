@@ -4,6 +4,8 @@
    先生へ: 問題を かえるときは、この すぐ下の LESSON だけを 書きかえます。
    ・漢字に ふりがなを つけるときは {漢字|よみ} と書きます（例: {日曜日|にちようび}）
    ・ことばの間には スペースを入れます（スペースの所でだけ 改行します）
+   ・正解の位置が いつも同じに ならないよう、選択肢の順を まぜてあります
+     （answer は 左から 0・1・2 と数えた番号。どうして？は ok: true が正解）
    ・天気は hare（はれ）／hare-kumori（はれ ときどき くもり）／kumori（くもり）／
      kumori-ame（くもり 一時雨）／ame（あめ）の5つ。曜日は mon tue wed thu fri sat sun
    ========================================================= */
@@ -45,17 +47,17 @@ const LESSON = {
           hint: { glow: ['sun'], grow: true },
           together: 'おひさまだから はれ だね' },
         { q: 'これは なんの てんき？', mark: 'ame',
-          choices: [{ label: 'あめ', icon: 'ame' }, { label: 'はれ', icon: 'hare' }], answer: 0,
+          choices: [{ label: 'はれ', icon: 'hare' }, { label: 'あめ', icon: 'ame' }], answer: 1,
           praise: 'すごい！ かさは あめ の マークだね',
           hint: { drip: true },
           together: 'かさだから あめ だね' },
         { q: 'これは なんの てんき？', mark: 'kumori',
-          choices: [{ label: 'くもり', icon: 'kumori' }, { label: 'はれ', icon: 'hare' }, { label: 'あめ', icon: 'ame' }], answer: 0,
+          choices: [{ label: 'はれ', icon: 'hare' }, { label: 'あめ', icon: 'ame' }, { label: 'くもり', icon: 'kumori' }], answer: 2,
           praise: 'そのとおり！ くもだけは くもり だね',
           hint: { float: true, pop: 'cloud' },
           together: 'くもだけだから くもり だね' },
         { q: 'おひさまと くもが いるよ。どんな てんき？', mark: 'hare-kumori',
-          choices: [{ label: 'はれ と くもり', icon: 'hare-kumori' }, { label: 'あめ', icon: 'ame' }], answer: 0,
+          choices: [{ label: 'あめ', icon: 'ame' }, { label: 'はれ と くもり', icon: 'hare-kumori' }], answer: 1,
           praise: 'よくみたね！ おひさまと くもで「はれ ときどき くもり」だよ',
           hint: { seq: ['sun', 'cloud'] },
           together: 'おひさまと くもだから はれ と くもり だね' },
@@ -118,12 +120,12 @@ const LESSON = {
           hint: {}, togetherDay: 'はれだから にちようび だね', togetherWhy: 'はれの ひだから「はれだから」だね' },
         { week: 1, q: 'えんそくは なんようびに する？', task: 'ensoku',
           days: ['sat', 'fri', 'thu'], answer: ['sat'],
-          reasons: [{ text: 'あめが ふらないから', icon: 'weather-hare-kumori.svg', ok: true }, { text: 'あめが ふるから', icon: 'weather-ame.svg' }],
+          reasons: [{ text: 'あめが ふるから', icon: 'weather-ame.svg' }, { text: 'あめが ふらないから', icon: 'weather-hare-kumori.svg', ok: true }],
           praise: 'すごい！ おひさまが いるから どようびで いいね',
           hint: { note: 'かさが ないね' }, togetherDay: 'かさが ないから どようび だね', togetherWhy: 'かさが ないから「あめが ふらないから」だね' },
         { week: 1, q: 'ピアノは なんようびに する？', task: 'piano',
           days: ['fri', 'wed', 'mon'], answer: 'any',
-          reasons: [{ text: 'いえの なかで できるから', icon: 'badge-naka.svg', ok: true }, { text: 'はれだから', icon: 'weather-hare.svg' }],
+          reasons: [{ text: 'はれだから', icon: 'weather-hare.svg' }, { text: 'いえの なかで できるから', icon: 'badge-naka.svg', ok: true }],
           praise: 'ばっちり！ ピアノは なかだから あめの ひでも できるね',
           afterNote: 'あめの ひに なかの ようじを すると、はれの ひを そとの ようじに つかえるね',
           hint: {}, togetherWhy: 'ピアノは なかだから「いえの なかで できるから」だね' },
@@ -134,7 +136,7 @@ const LESSON = {
           hint: { note: 'かさが ないね' }, togetherDay: 'かさが ないから きんようび だね', togetherWhy: 'かさが ないから「あめが ふらないから」だね' },
         { week: 2, q: 'えいがは なんようびに みる？', task: 'cinema',
           days: ['sat', 'wed', 'mon'], answer: 'any',
-          reasons: [{ text: 'たてものの なかだから', icon: 'badge-naka.svg', ok: true }, { text: 'はれだから', icon: 'weather-hare.svg' }],
+          reasons: [{ text: 'はれだから', icon: 'weather-hare.svg' }, { text: 'たてものの なかだから', icon: 'badge-naka.svg', ok: true }],
           praise: 'すばらしい！ えいがかんは なかだから あめでも だいじょうぶ',
           afterNote: 'あめの ひに なかの ようじを すると、はれの ひを そとの ようじに つかえるね',
           hint: {}, togetherWhy: 'えいがかんは なかだから「たてものの なかだから」だね' }
@@ -314,9 +316,13 @@ addEventListener('resize', fitApp); fitApp();
   pages.push({ type: 'result' });
   const firstPageOf = si => pages.findIndex(p => p.si === si);
 
-  const state = { page: -1, started: false, timers: [], token: 0, cleared: new Set(), plan: { 1: {}, 2: {} } };
-  function later(fn, ms) { const tok = state.token; const t = setTimeout(() => { if (tok === state.token) fn(); }, ms); state.timers.push(t); return t; }
-  function clearTimers() { state.timers.forEach(clearTimeout); state.timers = []; state.token++; }
+  const state = { page: -1, started: false, clearPending: false, timers: [], token: 0, cleared: new Set(), plan: { 1: {}, 2: {} } };
+  function later(fn, ms) {
+    const tok = state.token;
+    const t = setTimeout(() => { state.timers = state.timers.filter(x => x !== t); if (tok === state.token) fn(); }, ms);
+    state.timers.push(t); return t;
+  }
+  function clearTimers() { state.timers.forEach(clearTimeout); state.timers = []; state.token++; state.clearPending = false; }
 
   /* ---- 設定ボタン ---- */
   function applySettings() {
@@ -337,10 +343,13 @@ addEventListener('resize', fitApp); fitApp();
   btnMotion.addEventListener('click', () => { S('play', 'tap'); settings.reduce = !settings.reduce; saveSettings(); applySettings(); });
 
   /* ---- おやすみ ---- */
-  let restReturnFocus = null;
+  let restReturnFocus = null, restRerender = false;
   function openRest() {
     S('play', 'tap'); stopReading();
     restReturnFocus = document.activeElement;
+    // 休むあいだは 後ろで 進めない（タイマーを止め、もどったら その ページを はじめから 出しなおす）
+    restRerender = state.page >= 0 && (state.timers.length > 0 || state.clearPending);
+    if (restRerender) clearTimers();
     restOverlay.classList.add('is-show');
     topbar.inert = true; Object.values(screens).forEach(s => { s.inert = true; });
     S('stop');
@@ -352,7 +361,14 @@ addEventListener('resize', fitApp); fitApp();
     if (state.started && settings.sound) S('start');
     S('setMuted', !settings.sound);
     S('play', 'tap');
-    if (restReturnFocus && document.contains(restReturnFocus)) restReturnFocus.focus();
+    if (restRerender) { restRerender = false; go(state.page); return; }
+    // 「ひとやすみ」ボタンには もどさない（Enter で また ひらかないように）
+    const act = $('.screen.is-active');
+    const nb = act && $$('#btn-next, #btn-clear-next', act).find(b => !b.hidden && b.offsetParent);
+    if (restReturnFocus && restReturnFocus !== btnRest && document.contains(restReturnFocus) && !restReturnFocus.disabled && restReturnFocus.offsetParent) focusQuiet(restReturnFocus);
+    else if (nb) focusQuiet(nb);
+    else if (state.page >= 0 && act === screens.play) focusQuiet(qText);
+    else focusQuiet($('#btn-start'));
   }
   btnRest.addEventListener('click', openRest);
   $('#btn-resume').addEventListener('click', closeRest);
@@ -454,7 +470,7 @@ addEventListener('resize', fitApp); fitApp();
     showScreen('play');
     screens.play.dataset.mode = mode;
     if (wide) board.dataset.layout = 'wide'; else delete board.dataset.layout;
-    visual.innerHTML = ''; list.innerHTML = ''; list.className = 'choice-list';
+    visual.innerHTML = ''; list.innerHTML = ''; list.className = 'choice-list'; list.style.flex = '';
     btnNext.hidden = true;
     hideFeedback(); setSpeech(''); setGuide(null);
   }
@@ -492,6 +508,12 @@ addEventListener('resize', fitApp); fitApp();
         setSpeech(ctx.firstMissText ? ctx.firstMissText(btn) : 'ひかって いる ところを よく みてね');
         narrow(btn);
         if (ctx.hint2) ctx.hint2();
+        // 押したボタンが押せなくなったら、のこった正解の候補（光っている物）か 問題文へ
+        const ae = document.activeElement;
+        if (!ae || ae === document.body || ae.disabled) {
+          const g = ctx.correct.find(b => b.classList.contains('is-guide') && !b.disabled);
+          focusQuiet(g || qText);
+        }
       } else {
         // 3回目: 正解を やさしく光らせ、いっしょに押す
         const ans = ctx.correct[0];
@@ -512,14 +534,31 @@ addEventListener('resize', fitApp); fitApp();
       const stay = Math.max(0, 2 - keep);
       order.slice(0, Math.max(0, order.length - stay)).forEach(b => { b.classList.remove('is-retry'); b.classList.add('is-dimmed'); b.disabled = true; });
     }
+    if (!list.classList.contains('choice-list--week')) reserveNext();
     ctx.all.forEach(b => b.addEventListener('click', () => {
       if (b.disabled || done) return;
       S('play', 'tap');
       if (ctx.correct.indexOf(b) >= 0) correct(b, false); else wrong(b);
     }));
   }
+  // 選択肢が つぎへ の横に おさまる幅なら、はじめから その幅で ならべる（答えたあとも 位置が ずれない）
+  function reserveNext() {
+    const bs = $$('button', list); if (!bs.length) return;
+    const scale = (document.getElementById('app').getBoundingClientRect().width / 1920) || 1;
+    const used = bs.reduce((w, b) => w + b.getBoundingClientRect().width / scale, 0) + 48 * (bs.length - 1);
+    list.style.flex = used <= 1300 - 300 - 48 ? '0 0 ' + (1300 - 300 - 48) + 'px' : '';
+  }
   function afterCorrect(btn, praise) {
-    $$('button', list).forEach(b => { if (b !== btn) b.hidden = true; });
+    // のこりの選択肢を消す。つぎへ（300px）と重ならない幅なら、場所を空けたまま消して 位置を保つ
+    const others = $$('button', list).filter(b => b !== btn);
+    const scale = (document.getElementById('app').getBoundingClientRect().width / 1920) || 1;
+    const all = [btn].concat(others);
+    const used = all.reduce((w, b) => w + b.getBoundingClientRect().width / scale, 0) + 48 * (all.length - 1);
+    const keepPlace = used <= 1300 - 300 - 48;
+    others.forEach(b => {
+      if (keepPlace) { b.style.visibility = 'hidden'; b.disabled = true; b.setAttribute('aria-hidden', 'true'); b.tabIndex = -1; }
+      else b.hidden = true;
+    });
     showFeedback('good', 'せいかい！');
     setSpeech(praise);
     setGuide('happy');
@@ -537,6 +576,7 @@ addEventListener('resize', fitApp); fitApp();
     visual.appendChild(mark);
     const btns = m.choices.map((c, i) => weatherChoice(c, i, true));
     btns.forEach(b => list.appendChild(b));
+    reserveNext();
     setSpeech(m.say);
     const ans = btns[m.answer];
     later(() => ans.classList.add('is-guide'), 1200);
@@ -830,6 +870,7 @@ addEventListener('resize', fitApp); fitApp();
     $('#clear-speech').innerHTML = ruby(si + 1 < LESSON.steps.length ? 'シールを はったよ。つぎも いっしょに やろう' : 'シールが 3まい そろったね');
     const nb = $('#btn-clear-next');
     nb.hidden = true;
+    state.clearPending = true;
     focusQuiet($('#clear-text'));
     S('play', 'clear');
     const tok = state.token;
@@ -838,6 +879,7 @@ addEventListener('resize', fitApp); fitApp();
     try { await Promise.race([Promise.resolve(p), new Promise(r => setTimeout(r, 2600))]); } catch (e) {}
     await new Promise(r => setTimeout(r, 300));
     if (tok !== state.token) return;
+    state.clearPending = false;
     nb.hidden = false; focusQuiet(nb);
   }
 
