@@ -22,6 +22,7 @@
   .wmark-part.is-float { animation: hintFloat 4s ease-in-out infinite; }
   @keyframes hintDrip  { 0% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(18px); opacity: .35; } 100% { transform: translateY(0); opacity: 1; } }
   @keyframes hintFloat { 0%, 100% { transform: translateX(-12px); } 50% { transform: translateX(12px); } }
+  #visual > .visual-note { position: relative; z-index: 1; }   /* ヒントの景色より前に */
   .hint-pop { position: absolute; right: 18px; top: 14px; width: 92px; height: auto; }
   #feedback.feedback--info .feedback-word { font-family: var(--font-body); font-size: var(--fs-body); font-weight: 700; line-height: 1.5; }
   /* 右の列: ほめことばが長くても あんない役に かからないように */

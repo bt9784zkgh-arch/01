@@ -771,7 +771,7 @@ addEventListener('resize', fitApp); fitApp();
       all: btns, correct: correctBtns, small: true, together: q.togetherDay || '',
       look: (b) => b.classList.add('is-look'),
       firstMissText: (b) => WEATHER[b.dataset.weather].umbrella && task.where === 'soto'
-        ? 'かさの ひだね。そとで できるかな？ もういちど みてみよう' : 'もういちど みてみよう',
+        ? 'かさの ひだね。そとで できるかな？' : 'もういちど みてみよう',   // 「もういちど みてみよう」は 合図の札にも出る
       hint2: () => {
         btns.forEach(b => b.classList.remove('is-look'));
         correctBtns.forEach(b => b.classList.add('is-guide'));
