@@ -438,6 +438,7 @@ html:not(.js-fit) #app { transform: none; left: 0; top: 0; }
   50%      { box-shadow: 0 8px 0 var(--c-ink), 0 0 0 16px rgba(228,199,126,.95); }
 }
 .choice.is-guide, .day-cell.is-guide { outline: 6px solid var(--c-tape); outline-offset: 4px; }
+.choice.is-guide:focus-visible, .day-cell.is-guide:focus-visible { outline-color: var(--c-focus); }
 .choice.is-placed { border-color: var(--c-primary); background: var(--c-primary-bg); }
 
 /* ---------------------------------------------------------
