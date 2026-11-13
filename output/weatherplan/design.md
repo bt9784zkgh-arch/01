@@ -321,3 +321,261 @@ const THEME = {
 
 ## 11. 見本で確かめたこと
 - 作業用の見本ページ（全画面）を Chromium で 1920×1080 と 1280×720 に出して、文字の はみ出し・重なりがないこと、同梱フォントが読みこまれること、`#btn-next` がどの画面でも同じ位置にあることを確かめた
+
+---
+
+## 12. ステップ4（ちょうせん）1しゅうかんの よていひょうを つくろう
+
+ワークシートの形（予報の表の下のマスに用事の番号を書く）を、手帳の **週の らん＋シール台紙** で作る。
+上に予報、その下に よていの マス、さらに下に **シール台紙（ようじの はこ）** から用事シールを はる。
+既存のクラスの見た目は変えていない。足したのは `.s4-*` と、いくつかの修飾クラス（`.step-picker--4`・`.btn-step--challenge`・`.board--result.is-s4` など）だけ。
+
+### 12-1. 1920×1080 に入るか（試しの画面で確かめた結果）
+見本ページ（本物の index.html の形＋style.css）を Chromium で 1920×1080 と 1280×720 に出して測った。
+
+| 確かめたこと | 結果 |
+|---|---|
+| 予報7列＋マス7つ＋カード7まい＋てじゅん＋やくそく＋右の列 | **入る**。ただし、カードを週の列（137px）にそろえると「べんきょう」「おしゃべり」（28pxで 140px）が入らなかった → **はこ（台紙）は 問題エリアの はば全部（1300px）を使い、カードは 171×156 の シール形** にした。てじゅんは 週の表の 左だけ |
+| 文字 28px以上 | すべて 28px以上（いちばん小さいのは てじゅん・やくそく・マス・カードの 28px。問題文 48px） |
+| ボタン 120px以上 | よていの マス 137×121、予報のマス（かさの日さがしで押す）137×227、カード 171×156、はこに もどす／ぜんぶ もどす 343×140、たしかめる 300×140、はい／いいえ 180×120 |
+| ことばの途中の改行 | なし。2行のラベルは span を分ける（下の表）。「カフェで おしゃべり」「ほんを よむ」だけ スペースで2行になる |
+| つぎへ・たしかめる の位置 | どちらも **x1160 y878 300×140**（ほかのステップの つぎへ と同じ） |
+| 右の列 | ほかのステップと同じ x1504・336px。上から 合図（150）／ふきだし／やくそく。**せんぱいの絵はステップ4の表の画面では出さない**（場所を やくそく に使う。気持ちは 合図のスタンプで伝える） |
+| 1280×720 | 同じ配置で縮むだけ。重なり・はみ出しなし |
+
+試しに測った 28px の文字はば（Zen Maru Gothic Bold）: かなは 1字 28px。「そとの ようじを」204px、「1にちに ようじは」215px、「あめ かも」120px。**これより長いことばを足すときは span で行を分ける**
+
+### 12-2. 画面の配置（`#board` に `data-layout="plan4"`）
+```
+ x160                                         x1460 x1504            x1840
+┌──────────────────────────────────────────────────┐ ┌──────────────────┐ y216
+│ #q-text 48px（1行）                  [#btn-read 168×120] │ │ #feedback 150     │
+├ - - - - - - - - - - - - - - - - - - - - - - - - - - - - ┤ │ スタンプ96＋ことば │ y366
+│[てじゅん]  ┌月─┬火─┬水─┬木─┬金─┬土─┬日─┐            │ ├──────────────────┤ y378
+│ (テープ)   │①  │②  │③  │④  │⑤  │⑥  │⑦  │ ←.key-num  │ │ #speech           │
+│.s4-rail   │げつ│ か │すい│もく│きん│ ど │にち│ (えらんで  │ │ ふきだし（しっぽ  │
+│ 284×354   │ 月 │ 火 │ 水 │ 木 │ 金 │ 土 │ 日 │  いる間)  │ │ なし）            │
+│ 1 絵 かさの│ ☀ │☀☁ │☁☂ │ ☁  │☀☁ │ ☂  │ ☀ │ .s4-fc    │ │                   │
+│   ひを さがす│はれ│はれと│くもり│くもり│はれと│あめ│はれ│ 137×227  │ │                   │
+│ 2 …       │   │くもり│あめかも│  │くもり│ 🏷 │   │ (かさの札)│ │                   │
+│ 3 …       ├───┼───┼───┼───┼───┼───┼───┤ y581      │ ├──────────────────┤ y708
+│ 4 …       │ ＋ │ ＋ │ ＋ │ ＋ │ ＋ │ ＋ │ ＋ │ .s4-slot  │ │[やくそく](テープ)  │
+│           │   │   │   │   │   │   │   │ 137×121   │ │ 絵 1にちに ようじは │
+├───────────┴───┴───┴───┴───┴───┴───┴───┘ y702      │ │      1つ          │
+│┌はこ┬─①──┬─②──┬─③──┬─④──┬─⑥──┬─⑦──┬─⑧──┐ .s4-tray │ │ 絵 そとの ようじは │
+││ 絵 │ 絵  │ 絵  │ 絵  │ 絵  │ 絵  │ 絵  │ 絵  │ x160 y710│ │      はれの ひに   │
+││はこ│ピアノ│えんそく│カフェで│べんきょう│ほんを よむ│えいが│サッカー│ 1300×156 │ │ 絵 なかの ようじは │
+│└64─┴171─┴───┴おしゃべり┴───┴───┴───┴───┘           │ │      どの ひでも いい│
+├──────────────────────────────────────────────────┤ │ .s4-yakusoku 318  │
+│[はこに もどす 343×140] [ぜんぶ もどす]      [たしかめる  ]│ │                   │
+│ #choice-list.choice-list--s4tools        #btn-check   │ │                   │
+│                                  x1160 y878 300×140 │ │                   │
+└──────────────────────────────────────────────────┘ └──────────────────┘ y1026
+```
+- grid: `#board[data-layout="plan4"]` の行は 120 / 1fr / 152。`#visual` は中で grid（列 284｜1fr、行 1fr｜156、`"rail week" "tray tray"`）
+- 週の列と マスの列は同じ7列（すきま 6px）。カードの列は 週と そろえない（はばが足りないため）
+- 問題中に動く物はない。動くのは 押したときの反応・カードの移動・ゆっくりのヒントだけ
+- 「くらべよう」画面（問2の前）は ステップ3と同じ `.week-table`（`data-layout="wide"`）をそのまま使う
+- 「どうして？」は `data-layout` なし（ふつうの配置）。問1・2-1 は ステップ3と同じ `.pick-pair`、2-2 は `.s4-reason-days`（下）
+- 「おさらい」カード（ステップ4から始めたとき）は `data-layout="wide"` の `#visual` に `.s4-review`
+
+### 12-3. マークアップの形（このとおりに作ると CSS がそのまま効く）
+```html
+<!-- index.html に足すもの（3つ） -->
+<!-- (1) 進み具合の3行目: .progress-text の中 -->
+<p class="progress-text"><span id="prog-step">ちょうせん（ステップ4）</span><span id="prog-q">1もんめ ／ ぜんぶで 2もん</span><span id="prog-placed">おいた ようじ 0 ／ 4</span></p>
+<!-- (2) たしかめる: #choices の中、#btn-next の すぐ後。ステップ4の表の画面だけ hidden をはずす -->
+<button id="btn-check" class="btn-primary s4-check is-waiting" type="button" hidden>
+  <span class="label"><span>たしかめる</span><span id="btn-check-left">あと 4こ</span></span></button>
+<!-- 全部おいたら .is-waiting をはずし、2つ目の span を空にする（または hidden） -->
+<!-- (3) やくそく: #side の中、#speech と #guide の間。CSS が plan4 の時だけ出す（hidden は使わない） -->
+<section id="s4-yakusoku" class="s4-yakusoku" aria-labelledby="s4-yakusoku-head">
+  <h3 class="s4-yakusoku-head" id="s4-yakusoku-head">やくそく</h3>
+  <ol class="s4-rules">
+    <li class="s4-rule"><img src="assets/rule-1.svg" alt=""><span class="label"><span>1にちに ようじは</span><span>1つ</span></span></li>
+    <li class="s4-rule"><img src="assets/rule-2.svg" alt=""><span class="label"><span>そとの ようじは</span><span>はれの ひに</span></span></li>
+    <li class="s4-rule"><img src="assets/rule-3.svg" alt=""><span class="label"><span>なかの ようじは</span><span>どの ひでも いい</span></span></li>
+  </ol>
+</section>
+
+<!-- #visual の中（plan4）: てじゅん・週の表・はこ の3つ -->
+<aside class="s4-rail" aria-labelledby="s4-tejun-head">
+  <h3 class="s4-tejun-head" id="s4-tejun-head">てじゅん</h3>
+  <ol class="s4-tejun">
+    <li class="s4-tejun-item"><span class="s4-tejun-no" aria-hidden="true">1</span><img class="s4-tejun-icon" src="assets/tejun-1.svg" alt="">
+      <span class="label"><span>かさの ひを</span><span>さがす</span></span></li>
+    <!-- 2: tejun-2.svg「かさの ひには」「なかの ようじ」 3: tejun-3.svg「そとの ようじを」「はれの ひに」 4: tejun-4.svg「のこりの ひに」「のこりの ようじ」 -->
+  </ol>
+</aside>
+
+<div class="s4-week" id="s4-week">           <!-- カードを えらんでいる間 .is-holding、かさの日さがしの間 .is-kasa -->
+  <div class="s4-day" data-day="tue">
+    <!-- 予報: ふだんは div。かさの日さがしの間だけ button にする -->
+    <div class="day-cell s4-fc" data-weather="hare-kumori" data-day="tue">
+      <span class="key-num" aria-hidden="true">2</span>          <!-- 1〜7 = げつ〜にち。.is-holding/.is-kasa の時だけ見える -->
+      <span class="day-name" aria-hidden="true"><ruby>火<rt>か</rt></ruby></span>
+      <div class="wmark wmark--hare-kumori wmark--s4" role="img" aria-label="おひさまと くもの マーク">
+        <img class="wmark-part wmark-part--sun" src="assets/wpart-sun.svg" alt="">
+        <img class="wmark-part wmark-part--cloud" src="assets/wpart-cloud.svg" alt=""></div>
+      <span class="day-weather" aria-hidden="true"><span>はれ と</span><span>くもり</span></span>
+      <!-- かさの日を見つけたら: <img class="s4-kasa-tag" src="assets/kasa-tag.svg" alt="">（.has-kasa もつける） -->
+    </div>
+    <button class="s4-slot" type="button" data-day="tue">
+      <!-- 空なら 中は sr-only だけ。おいたら .is-filled と .s4-chip -->
+      <span class="s4-chip" data-task="ensoku">
+        <img class="s4-chip-pic" src="assets/task-ensoku.svg" alt="">
+        <span class="s4-num" aria-hidden="true">2</span>
+        <img class="s4-where" src="assets/badge-soto.svg" alt="">
+      </span>
+      <span class="sr-only">かようび、はれ ときどき くもり、えんそく</span>   <!-- 空: 「かようび、はれ ときどき くもり、あいている」 -->
+    </button>
+  </div>
+  <!-- …7日分 -->
+</div>
+
+<div class="s4-tray" id="s4-tray" role="group" aria-label="ようじの はこ">
+  <div class="s4-tray-label" aria-hidden="true"><img src="assets/icon-box.svg" alt="">はこ</div>
+  <button class="s4-card" type="button" data-task="piano">
+    <span class="s4-num" aria-hidden="true">1</span>
+    <img class="s4-where" src="assets/badge-naka.svg" alt="">
+    <img class="s4-card-pic" src="assets/task-piano.svg" alt="">
+    <span class="label">ピアノ</span>
+    <span class="sr-only">1ばん、なかの ようじ</span></button>
+  <!-- マスへ出したカードの場所は、番号だけの あと（ならびが ずれない） -->
+  <div class="s4-card-ghost" aria-hidden="true"><span class="s4-num">1</span></div>
+  <!-- 番号順: 1 ピアノ／2 えんそく／3 カフェで おしゃべり／4 べんきょう／6 ほんを よむ／7 えいが／8 サッカー（問1は 1・2・6・8 の4まい） -->
+</div>
+
+<!-- #choice-list（plan4 では class="choice-list choice-list--s4tools"） -->
+<button id="btn-s4-return" class="btn-secondary s4-tool" type="button" disabled>
+  <img src="assets/icon-return.svg" alt=""><span class="label">はこに もどす</span></button>
+<button id="btn-s4-clear" class="btn-secondary s4-tool" type="button">
+  <img src="assets/icon-return-all.svg" alt=""><span class="label">ぜんぶ もどす</span></button>
+<!-- 「ぜんぶ もどす」を押したら、上の2つに hidden をつけて、かわりに これを出す -->
+<div class="s4-confirm" id="s4-confirm" role="group" aria-labelledby="s4-confirm-q" hidden>
+  <p class="s4-confirm-q" id="s4-confirm-q">ぜんぶ もどす？</p>
+  <button id="btn-s4-yes" class="btn-secondary" type="button">はい</button>
+  <button id="btn-s4-no"  class="btn-primary"   type="button">いいえ</button>   <!-- 消えない方を目立たせ、フォーカスも いいえ へ -->
+</div>
+```
+- 用事の番号は ワークシートの番号（①②③④⑥⑦⑧）。丸数字の文字（①）は同梱フォントに無いので、`.s4-num`（丸い わく＋数字）で描く
+- そと／なかマーク（`.s4-where`）は カードにも マスの用事にも つける（青空＝そと、家＝なか）
+- 天気マークは ステップ4の予報では **パーツを重ねる `.wmark.wmark--s4`**（62px）を使う。ヒントで おひさまだけ光らせるため（1枚の weather-*.svg では一部だけ光らせられない）
+- 見せる／かくすは `hidden` 属性（`[hidden]{display:none !important}` が効く）。`.s4-yakusoku` だけは CSS が plan4 で出す
+- 漢字は曜日だけ（ruby）。ステップ4の問題文・ボタン・やくそく・てじゅんは ひらがなとカタカナだけ
+
+### 12-4. 状態クラス
+| クラス | つける所 | 見た目（色だけにしない） |
+|---|---|---|
+| `.is-holding` | `.s4-week` | カードを えらんでいる間。空いたマスが 実線＋白地＋「＋」、押せる影。予報の `.key-num`（1〜7）が出る |
+| `.is-kasa` | `.s4-week` | 「かさの ひを さがそう」の間。予報 `.s4-fc` を button にし、`.key-num` を出す |
+| `.has-kasa` | `.s4-fc` | かさの日を見つけた。`img.s4-kasa-tag`（かさの札）が ぶらさがる（そのあとも のこす） |
+| `.is-retry` `.is-guide` | `.s4-fc`（かさの日さがし） | 既存と同じ（点線＋むしめがね／テープ色の わく＋ゆっくり光る） |
+| `.is-selected` | `.s4-card`、`.s4-slot`（中の用事を えらんだとき） | 10px うき上がり＋わくが 太くなる（4px の ink を外に足す。大きさは かわらない）＋上に テープの帯 |
+| `.is-filled` | `.s4-slot` | 用事が入っている。実線のわく |
+| `.is-ok` | `.s4-slot`（たしかめた後） | みどりの太いわく＋うすい みどり地＋チェックのスタンプ（ぽんと出る 0.35秒） |
+| `.is-redo` | `.s4-slot`（おきなおす マスだけ） | 太い点線＋むしめがね＋中の用事が うき上がって すこし かたむく |
+| `.is-look` | `.s4-fc` | 1回目: その日の マーク（かさ／くも）を 1.25倍 |
+| `.is-sun-hint` | `.s4-fc`（おひさまの ある日 全部） | 2回目: マークの まわりに 点線の まる＋テープ色の わく。あわせて `.wmark-part--sun` に `.is-glow`（2.4秒に1回 ゆっくり。点滅しない） |
+| `.is-guide` | `.s4-slot`・`.s4-card`・`#btn-check` | 3回目の行き先・おてほんの「ここを押すよ」。テープ色の わく＋ゆっくり光る。フォーカス中は みどりの わく（前回の△の対策ずみ） |
+| `.is-nudge` | `.s4-card`（はこの中 全部） | 「さきに ようじを えらぼう」: 1回だけ ゆっくり光る |
+| `.is-flying` | `.s4-chip`・`.s4-card` | 3回目に カードを ゆっくり運ぶ・入れかえ（`transform` を 1.2秒で。座標は game.js が FLIP で入れる） |
+| `.is-waiting` | `#btn-check` | まだ全部おいていない: 白地・点線・「あと ○こ」（文字は ink 12:1 のまま。うすい色の文字にはしない） |
+| `.is-now` | `.s4-tejun-item`、`.s4-rule` | おてほん・ヒントで「いま この じゅんばん／この やくそく」: 太い ink の わく |
+| `:disabled` | `.s4-tool`（はこに もどす。何も えらんでいない時） | 点線のわく・絵が うすい。文字は ink のまま |
+
+### 12-5. 各場面の出し方
+| 場面 | 画面 |
+|---|---|
+| おさらい（ステップ4から始めたとき） | `data-layout="wide"`。`#visual` に `.s4-review` > `.s4-review-panel.ame`（weather-ame・weather-kumori-ame＋「かさの マークは／あめ」）・`.soto`（badge-soto＋2・8 の `.s4-chip`＋「2 と 8 は／そと」）・`.naka`（badge-naka＋1・3・4・6・7＋「のこりは／なか」）。`.s4-review-text` の中は span で2行 |
+| おてほん | plan4。しゅう1。せんぱいの ことばは `#speech`。じゅんばんに合わせて `.s4-tejun-item.is-now` を 1つずつ移す（1→2→3）。押す物は `.is-guide` → 押したら `.is-selected` → マスへ。さいごに `#btn-check.is-guide` |
+| かさの ひを さがそう | `.s4-week.is-kasa`、予報を button に。見つけたら `.has-kasa`＋かさの札。まちがいは 既存の `.is-retry`、2回目は かさの日に `.is-guide`。終わったら div にもどす |
+| おく・入れかえ | カード `.is-selected` → `.s4-week.is-holding` → マスを押す → `.s4-slot.is-filled`＋`.s4-chip`、はこには `.s4-card-ghost`。入れかえは 2まいとも `.is-flying` で ゆっくり |
+| ぜんぶ もどす | 道具ボタン2つに hidden → `#s4-confirm` を出す（その場で。画面全体には重ねない） |
+| たしかめる | 正しいマスから 1つずつ `.is-ok`（0.5秒おき。うごき すくなめ では いっせい）。おきなおす マスだけ `.is-redo`。合図は「もういちど みてみよう」（むしめがね） |
+| ヒント 1回目／2回目／3回目 | `.s4-fc.is-look`／晴れ系の日 全部に `.is-sun-hint`＋おひさまの `.is-glow`／カードを `.is-flying` で 晴れ系の いちばん早い日へ、行き先の マスに `.is-guide` |
+| ぜんぶ せいかい | `#feedback.feedback--good`、全部のマスが `.is-ok`、`#btn-check` を hidden にして `#btn-next` |
+| どうして？ 1・2-1 | ステップ3と同じ `.pick-pair`（`.task-card` → `.pick-arrow` → `.day-cell.is-picked`）＋`.choice--reason`。かさの絵 weather-ame.svg、おひさまの絵 weather-hare.svg、家マーク badge-naka.svg |
+| どうして？ 2-2 | `#visual` に `.s4-reason-days` > `.day-cell.is-picked` ×2（水・土。中に `.task-chip`）。選択肢の絵は badge-soto.svg／badge-naka.svg |
+| ステップ4 クリア | 既存の `#screen-clear`。`#clear-medal` に medal-step4.svg、「ステップ4 クリア！」、`.clear-sub`「1しゅうかんの よていが たてられたね」 |
+
+### 12-6. タイトルの「ステップを えらぶ」（4つ）
+- `#step-picker` に `.step-picker--4` をつける → 2×2 の横長ボタン（397×157。左に メダル92px、右に ことば3行）。`.is-picking` の切りかえは今までどおり
+- ステップ4のボタンは `button.btn-step.btn-step--challenge`: 地が うすい テープ色（ink 11.3:1）＋内がわに ぬい目の点線＋メダルが **四角い手帳の形**（ステップ1〜3は まるい ぎざぎざ）。色・形・ことばの3つで「とくべつな 課題」とわかる
+- ことば: `ステップ4<br>ちょうせん<br>よていひょう`（`.key-num` 4）
+- 縦は ページの中に おさまる（ボタンの下 y985、ページの下 y1026）
+
+### 12-7. ふり返り（ステップ4を クリアしたとき）
+- `.board--result` に `.is-s4` をつける → CSS だけで並びが変わる（`.result-left` を `display:contents` にする。DOM は動かさない）
+```
+┌ x160 ───────── 560 ─┐┌ x760 ───────────────── 1080 ──────────────┐
+│ さいごまで できたね！  ││ きみの 1しゅうかんの よていひょうだよ（.plan-head） │
+│ (medal1) てんきの …   ││      げつ か すい もく きん ど にち          │
+│ (medal2) そとの …     ││ しゅう1 [☀][☀☁][☁][☁☂①][☂⑥][☀☁②][☀⑧]       │
+│ (medal3) そとの …     ││ しゅう2 [☀③][☀☁④][☁☂①][☁⑥][☀☁②][☂⑦][☀⑧]   │
+│ (medal4) 1しゅうかんの…││   .week-table.week-table--plan4（2週を上下）     │
+│   ✓ かさの ひには …   │├─────────────────────────────────────────┤ y898
+│   ✓ てんきが かわると…││ [もういちど あそぶ]      [ステップを えらぶ]    │
+└───────────────────┘└─────────────────────────────────────────┘
+```
+- できたこと: ステップ4の1行目は `li.result-item`（medal-step4）、2・3行目は `li.result-item.result-item--sub`（メダルなし。チェックの しるし）。ステップ4だけ遊んだときは この3行だけ
+- 表: `.week-table.week-table--plan4`。マスは `.day-cell`（day-mark＋day-weather＋`.day-slot` に `.s4-chip`）。**そとの用事が入ったマスに `.is-soto-plan`** → 用事のまわりに 青空色の太いわく（＋チップの そとマーク）。週で曜日が変わったことが 形で見える
+- ステップ3も遊んでいても、表は ステップ4の しゅう1（問1）・しゅう2（問2）を出す
+- 6行と表と ボタンが入ることを 1920×1080・1280×720 で確かめた（左の列の下 y1000 前後。行を これ以上ふやすなら `.result-item` を 28px に）
+
+### 12-8. 色（足したもの）
+| 変数 | 色 | 使う所 | コントラスト |
+|---|---|---|---|
+| `--c-sheet` | `#EFE7D6` | ようじの はこ（シール台紙。ミシン目つき） | ink 11.0:1 |
+| `--c-tape-bg` | `#F6EBCB` | ステップ4の えらぶボタンの地 | ink 11.3:1 |
+| （既存）`--c-soto-dark` | `#1E5F7C` | ふり返りの そとの用事の わく | そと地の上 5.7:1・はれ地の上 5.4:1（わく 3:1以上） |
+| （既存）`--c-sun-dark` | `#9A3A18` | おひさまヒントの 点線の まる | はれ地 5.4:1・くもり地 5.5:1 |
+| （既存）`--c-ink-soft` | `#53595F` | 空いたマスの点線・はこから出した あと | ページ 6.8:1・白 7.1:1（**ページと白の上だけ**） |
+
+### 12-9. キーボード（案。組立担当が決める）
+- Tab の順: てじゅん（読むだけ。フォーカスなし）→ 予報（かさの日さがしの間だけ）→ マス 月〜日 → はこの カード 番号順 → はこに もどす → ぜんぶ もどす → たしかめる
+- 数字キー: **カードは ワークシートの番号**（1・2・3・4・6・7・8 キーで そのカード）。カードを えらんでいる間（`.is-holding`）は **1〜7＝げつ〜にち の マス**（予報の上に `.key-num` が出る）。かさの日さがしの間も 1〜7＝曜日。Esc で えらんだのを はなす
+- フォーカスわくは どこでも 6px の みどり（`.is-guide`・`.is-sun-hint` の上でも みどり）
+
+### 12-10. 音を鳴らす場面（sound-maker・game-builder 向け）
+| きっかけ | 音 | 3D | 画面 |
+|---|---|---|---|
+| カード・マスの用事を えらぶ | `tap` | | `.is-selected` |
+| マスに おく・入れかえ | `place`（ぽこっ。シールを はる 短い音。無ければ `tap`） | | `.is-filled`／`.is-flying` |
+| はこに もどす・ぜんぶ もどす（はい） | `tap` | | |
+| 「さきに ようじを えらぼう」 | 鳴らさない | | `.s4-card.is-nudge` |
+| かさの日を見つけた | `correct`（小さめでよい） | `celebrate(x,y,{small:true})` | `.has-kasa` |
+| かさの日さがし まちがい | `retry` | `encourage()` | `.is-retry` |
+| たしかめる: 1マスずつ スタンプ | `stamp`（ぽん。0.5秒おき。小さい音。無ければ鳴らさない） | | `.is-ok` |
+| おきなおす マスが ある | `retry` を 1回だけ | `encourage()` | `.is-redo` |
+| 全部 せいかい | `correct` | `celebrate(x,y)` を表の中心で | `#feedback.feedback--good` |
+| どうして？ | ステップ3と同じ | ステップ3と同じ | |
+| ヒントの光 | 鳴らさない | | `.is-look`／`.is-sun-hint` |
+| ステップ4 クリア | `clear` | `await stepClear(4)` | `#screen-clear` |
+
+### 12-11. 3D担当（motion-3d）向け: `stepClear(4)` のメダル
+- 形: ステップ1〜3の まるい ぎざぎざ ではなく、**角が少し丸い 四角の手帳**（たて・よこ 1.3、厚さ 0.06。`Shape` を `ExtrudeGeometry`、角の半径 0.12）。上の ふちに リング3つ（細い `TorusGeometry` を半分）
+- 色: 表紙（ふち・うら） **primary `0x2E5E4E`**、表の ページ page `0xFCFAF4`、ほし **tape `0xE4C77E`**（右下に 少し はみ出す 星形の うすい板。輪郭は ink）、リング `0x5F666D`
+- 表に `assets/medal-step4.svg` を `CanvasTexture` で貼る。motion3d.js は medal-step1〜3 を中に入れているので、**medal-step4.svg も同じ形で入れる**（file:// で読めるように）
+- 動き・場所は 1〜3 と同じ（くるっと回って `#clear-medal` の中心 (430, 461)・直径380px に「ぺたっ」。2秒以内）。うごき すくなめ では その場に ふわっと出るだけ
+- ふり返りの上の帯のシールは 4つになる: 中心 x260・420・580・**740**、y92、直径100px以下（x120–1200 の中）
+
+### 12-12. 素材（assets/ に足した自作SVG）
+| ファイル | 内容 | 使う場所 |
+|---|---|---|
+| medal-step4.svg | 手帳の形のシール（みどりの表紙・週の らん・リング・ほし）240×240 | `#clear-medal`、`.btn-step--challenge`、`.result-item` |
+| kasa-tag.svg | かさの絵の 下げ札（ひもつき）96×120 | `.s4-kasa-tag` |
+| tejun-1〜4.svg | てじゅんの絵（むしめがね＋かさ／かさの下の家／そとマーク＋おひさま／マスが うまっていく）120×120 | `.s4-tejun-icon` |
+| rule-1〜3.svg | やくそくの絵（マスに 1まい／そとマーク＋おひさま／家マーク＋おひさま・くも・かさ）120×120 | `.s4-rule img` |
+| icon-box.svg | ようじの はこ（ひらいた箱） | `.s4-tray-label` |
+| icon-return.svg / icon-return-all.svg | 箱に 1まい／3まい もどす | `#btn-s4-return`・`#btn-s4-clear` |
+
+### 12-13. 前の指摘を くりかえさないための きまり（ステップ4）
+| 前の指摘 | ステップ4での対策 |
+|---|---|
+| コントラスト | 色つきの地の上の文字は ink（10:1以上）。`--c-ink-soft` は 点線のわくだけ（文字には使わない）。「あと ○こ」の たしかめるも 文字は ink のまま、点線のわくで「まだ」を伝える |
+| ことばの途中の改行 | 2行のことばは span を分けて `nowrap`（てじゅん・やくそく・おさらい・たしかめる）。カードの名前は スペースでだけ折れる（「カフェで／おしゃべり」「ほんを／よむ」）。カードの はばは いちばん長い1語（140px）が入る 171px |
+| `[hidden]` | 出す／かくすは `hidden` 属性で。ステップ4のクラスは `display` を指定しても `[hidden]{display:none !important}` に負ける。やくそくだけは CSS（`data-layout`）で出しわけ |
+| フォーカスわくの色 | `.is-guide`・`.is-sun-hint` のついた物も `:focus-visible` で みどりの わくにもどす（`.s4-slot`・`.s4-card`・`#btn-check`・`.s4-fc`） |
+| ヒントの絵が合図に隠れる | 合図は 右の列の上だけ。表・はこには重ねない。スタンプは マスの角に 小さく（56px） |
+| 点滅 | 光は 2.4秒に1回。スタンプは 1回ぽんと出るだけ。画面全体の光なし |

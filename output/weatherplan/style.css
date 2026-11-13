@@ -756,3 +756,378 @@ body.reduce-motion .wmark-part.is-glow { filter: drop-shadow(0 0 8px #E4C77E) dr
   .choice.is-guide, .day-cell.is-guide { box-shadow: 0 8px 0 var(--c-ink), 0 0 0 14px rgba(228,199,126,.95); }
   .wmark-part.is-glow { filter: drop-shadow(0 0 8px #E4C77E) drop-shadow(0 0 3px #B8913A); }
 }
+
+/* =========================================================
+   ステップ4（ちょうせん）1しゅうかんの よていひょうを つくろう
+   ここから下は ステップ4 だけで使うクラス（design.md 12章）。
+   上の既存クラスの見た目は かえていない（.s4-* と 新しい修飾クラスだけ）
+   ========================================================= */
+:root {
+  --c-sheet:   #EFE7D6;  /* ようじの はこ（シール台紙）。ink 11.0:1 */
+  --c-tape-bg: #F6EBCB;  /* ちょうせんの ボタンの地。ink 11.3:1 */
+  --s4-col-gap: 6px;     /* 曜日の列と カードの列の すきま（列をそろえる） */
+  --s4-move: 1.2s;       /* カードが ゆっくり うごく時間（3回目の こたえ・入れかえ） */
+}
+
+/* ---- 画面の わけかた: #board[data-layout="plan4"] ----
+   上: 問題（120） ／ 中: #visual = てじゅん＋週の表＋はこ ／ 下: #choices = 道具ボタン＋たしかめる
+   右の列（#side x1504 336px）と つぎへ の位置（x1160 y878 300×140）は ほかのステップと同じ */
+#board[data-layout="plan4"] { grid-template-rows: 120px 1fr 152px; }
+#board[data-layout="plan4"] #question-area { gap: 24px; }
+#board[data-layout="plan4"] .read-btn { height: 120px; }
+#board[data-layout="plan4"] #visual {
+  display: grid;
+  grid-template-columns: 284px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 156px;
+  grid-template-areas: "rail week" "tray tray";
+  gap: 8px 20px;
+  align-items: stretch; justify-content: stretch;
+  padding: 12px 0 8px;
+}
+#board[data-layout="plan4"] #choices { align-items: flex-end; gap: 24px; padding-bottom: 8px; }
+#board[data-layout="plan4"] #btn-next { margin-bottom: 0; }
+#board[data-layout="plan4"] .choice-list--s4tools { flex: 0 1 auto; justify-content: flex-start; gap: 24px; align-items: flex-end; }
+
+/* 右の列: 合図（150）／ふきだし／やくそく。せんぱいの絵は ステップ4では出さない（場所を やくそくに使う） */
+#board[data-layout="plan4"] #side { grid-template-rows: 150px minmax(0, 1fr) auto; gap: 12px; }
+#board[data-layout="plan4"] #guide { display: none; }
+#board[data-layout="plan4"] #feedback img { width: 96px; height: 96px; }
+#board[data-layout="plan4"] .speech::after { display: none; }
+#board[data-layout="plan4"] .speech { overflow: hidden; }
+
+/* ---------------------------------------------------------
+   左: てじゅん（4つ）＋ ようじの はこ の札
+   --------------------------------------------------------- */
+.s4-rail { grid-area: rail; position: relative; min-height: 0; padding-top: 16px; }
+.s4-tejun {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 4px;
+  background: var(--c-page);
+}
+.s4-tejun-head {   /* テープで とめた 見出し（問題エリアの 点線に すこし かかる） */
+  position: absolute; left: 4px; top: -30px; margin: 0; z-index: 1;
+  font-family: var(--font-hand); font-weight: 400; font-size: 36px; line-height: 1.25;
+  padding: 0 14px; background: var(--c-tape); color: var(--c-ink);   /* テープ地に ink 8.2:1 */
+  transform: rotate(-2deg); border-radius: 3px;
+}
+.s4-tejun-item {
+  position: relative;
+  display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 8px; align-items: center;
+  padding: 0 4px 0 6px;
+  border: 3px solid transparent; border-radius: var(--radius-label);
+  font-size: var(--fs-small); font-weight: 700; line-height: 1.3;   /* 2行の ラベル（ボタンと同じ 1.3） */
+}
+.s4-tejun-item .s4-tejun-icon { width: 48px; height: 48px; }
+.s4-tejun-item .s4-tejun-no {   /* 1〜4 の じゅんばん（絵の左上） */
+  position: absolute; left: -10px; top: -6px;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--c-card); border: 3px solid var(--c-ink);
+  font-size: 28px; font-weight: 700; line-height: 1;
+}
+.s4-tejun-item .label > span { display: block; white-space: nowrap; }  /* 2行。span で分ける */
+/* おてほん・ヒントで「いま この じゅんばん」: 太いわく＋テープの しるし（色だけにしない） */
+.s4-tejun-item.is-now { border-color: var(--c-ink); border-width: 4px; background: var(--c-card); box-shadow: 0 4px 0 var(--c-ink); }
+
+
+/* ---------------------------------------------------------
+   中: 週の表（上に予報、下に よていの マス）
+   --------------------------------------------------------- */
+.s4-week {
+  grid-area: week; min-height: 0;
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); column-gap: var(--s4-col-gap);
+}
+.s4-day { display: flex; flex-direction: column; gap: 6px; min-width: 0; min-height: 0; }
+
+/* 予報のマス（.day-cell を そのまま使い、大きさだけ ステップ4用に） */
+.day-cell.s4-fc {
+  width: auto; height: auto; flex: none;
+  padding: 2px 2px 6px;
+  border-radius: 6px 6px 10px 10px;
+}
+.day-cell.s4-fc .day-name { font-size: 32px; line-height: 1.25; margin-bottom: 4px; }
+.day-cell.s4-fc .day-weather { line-height: 1.3; min-height: calc(2 * 1.3em); }
+.day-cell.s4-fc .key-num { display: none; width: 48px; height: 48px; left: -14px; top: -14px; }
+.s4-week.is-holding .s4-fc .key-num,
+.s4-week.is-kasa .s4-fc .key-num { display: flex; }    /* 数字キーで マス（げつ〜にち＝1〜7）を えらべる間だけ */
+/* button になる時（かさの ひを さがそう）は 押せる影 */
+button.day-cell.s4-fc { box-shadow: 0 6px 0 var(--c-ink); }
+
+/* 小さい天気マーク（パーツを重ねるので、おひさまだけ 光らせられる） */
+.wmark.wmark--s4 { width: 62px; height: 62px; margin: 0 auto 2px; transition: transform .4s ease; }
+.s4-fc.is-look .wmark--s4 { transform: scale(1.25); }          /* 1回目: その日の マークを 大きく */
+.s4-fc.is-sun-hint .wmark--s4::before {                         /* 2回目: おひさまの ある日に まるい しるし（止めても のこる） */
+  content: ""; position: absolute; inset: -6px;
+  border: 4px dashed var(--c-sun-dark); border-radius: 50%;
+}
+.s4-fc.is-sun-hint { outline: 5px solid var(--c-tape); outline-offset: 3px; }
+.s4-fc.is-sun-hint:focus-visible { outline-color: var(--c-focus); }
+
+/* かさの ふだ（かさの ひを 見つけたら つく。そのあとも 出しておく） */
+.s4-kasa-tag {
+  position: absolute; right: -10px; top: 46px; width: 48px; height: auto;
+  transform: rotate(8deg); pointer-events: none; z-index: 2;
+}
+.s4-fc.has-kasa .s4-kasa-tag { animation: s4TagIn .5s var(--ease-pop) 1; }
+@keyframes s4TagIn { 0% { transform: rotate(-20deg) translateY(-14px); opacity: 0; } 100% { transform: rotate(8deg); opacity: 1; } }
+
+/* よていの マス（空なら 点線。カードを えらんでいる間は 実線で「ここに おける」） */
+.s4-slot {
+  position: relative; flex: 1 1 auto; min-height: 120px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px 4px;
+  background: var(--c-page);
+  border: 4px dashed var(--c-ink-soft);             /* ページの上 6.8:1 */
+  border-radius: 8px 8px 14px 14px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.s4-slot.is-filled { border-style: solid; border-color: var(--c-ink); background: var(--c-card); }
+.s4-week.is-holding .s4-slot { border-style: solid; border-color: var(--c-ink); background: var(--c-card); box-shadow: 0 6px 0 var(--c-ink); }
+.s4-week.is-holding .s4-slot:not(.is-filled)::before {   /* 空いたマスに ＋ の しるし（ここに おける） */
+  content: "+"; font-size: 56px; font-weight: 700; line-height: 1; color: var(--c-ink);
+}
+.s4-week.is-holding .s4-slot:hover { transform: translateY(-4px); box-shadow: 0 10px 0 var(--c-ink); }
+.s4-slot:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--c-ink); }
+.s4-slot.is-guide { outline: 6px solid var(--c-tape); outline-offset: 3px; animation: guideGlow 2.4s ease-in-out infinite; }
+.s4-slot.is-guide:focus-visible { outline-color: var(--c-focus); }
+
+/* マスに はった 用事（番号＋小さい絵＋そと/なかマーク） */
+.s4-chip { position: relative; display: block; width: 92px; height: 92px; flex: none; }
+.s4-chip > img.s4-chip-pic { width: 92px; height: 92px; border-radius: 10px; border: 3px solid var(--c-ink); background: var(--c-card); }
+.s4-chip .s4-num { position: absolute; left: -12px; top: -12px; }
+.s4-chip .s4-where { position: absolute; right: -14px; bottom: -12px; width: 40px; height: 40px; }
+.s4-chip.is-flying { transition: transform var(--s4-move) ease-in-out; z-index: 5; }
+
+/* 番号（ワークシートの ①②…。数字の文字を 丸で かこむ） */
+.s4-num {
+  width: 40px; height: 40px; flex: none; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--c-card); color: var(--c-ink); border: 3px solid var(--c-ink);
+  font-family: var(--font-body); font-size: 28px; font-weight: 700; line-height: 1;
+  z-index: 1;
+}
+
+/* えらんだ（カード・マスの中の用事）: うき上がり＋太いわく＋テープの帯（色だけにしない） */
+.s4-card.is-selected, .s4-slot.is-selected {
+  transform: translateY(-10px);
+  border-style: solid; border-color: var(--c-ink);
+  box-shadow: 0 0 0 4px var(--c-ink), 0 14px 0 var(--c-ink);   /* わくを 太く（大きさは かえない） */
+}
+.s4-card.is-selected::before, .s4-slot.is-selected::after {
+  content: ""; position: absolute; left: 50%; top: -16px; width: 86px; height: 26px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: repeating-linear-gradient(90deg, var(--c-tape) 0 10px, #D5B465 10px 13px);
+  clip-path: polygon(3% 8%, 97% 0, 100% 92%, 2% 100%, 0 50%);
+}
+
+/* こたえあわせ: できた マス ＝ みどりの太いわく＋チェックの スタンプ（1つずつ ぽんと） */
+.s4-slot.is-ok { border: 6px solid var(--c-primary); background: var(--c-primary-bg); box-shadow: 0 6px 0 var(--c-primary); }
+.s4-slot.is-ok::after {
+  content: ""; position: absolute; right: -8px; top: -10px; width: 56px; height: 56px;
+  background: url("assets/stamp-good.svg") center / contain no-repeat;
+  animation: s4StampIn .35s ease-out 1;
+}
+@keyframes s4StampIn { 0% { transform: scale(1.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+/* おきなおす マス ＝ 点線のわく＋むしめがね＋用事が少し うき上がる（そのマスだけ） */
+.s4-slot.is-redo { border: 6px dashed var(--c-ink); background: var(--c-card); }
+.s4-slot.is-redo::after {
+  content: ""; position: absolute; right: -8px; top: -10px; width: 56px; height: 56px;
+  background: url("assets/stamp-retry.svg") center / contain no-repeat;
+}
+.s4-slot.is-redo .s4-chip { transform: translateY(-8px) rotate(-5deg); filter: drop-shadow(0 8px 0 rgba(43,47,51,.45)); }
+
+/* ---------------------------------------------------------
+   はこ（シール台紙）と 用事カード
+   --------------------------------------------------------- */
+.s4-tray {
+  grid-area: tray; position: relative;
+  display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); column-gap: var(--s4-col-gap);
+  align-items: stretch;
+}
+/* はこの 名前（台紙の 左はし。「はこに もどす」の はこ） */
+.s4-tray-label {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font-size: var(--fs-small); font-weight: 700; line-height: 1.3; white-space: nowrap;
+}
+.s4-tray-label img { width: 56px; height: 56px; }
+.s4-tray::before {   /* 台紙: カードの まわりに すこし はみ出す（列の位置は 週の表と そろえたまま） */
+  content: ""; position: absolute; inset: -6px -10px -6px -10px; z-index: 0;
+  background-color: var(--c-sheet);
+  background-image: radial-gradient(circle at 6px 6px, rgba(43,47,51,.18) 1.5px, transparent 2px);  /* 台紙の ミシン目 */
+  background-size: 100% 12px; background-repeat: repeat-x; background-position: 0 2px;
+  border: 3px solid var(--c-ink); border-radius: 6px 12px 10px 8px;
+}
+.s4-card {
+  position: relative; z-index: 1; min-width: 0;
+  display: grid; grid-template-columns: 38px minmax(0, 1fr); grid-template-rows: 68px minmax(0, 1fr);
+  column-gap: 2px; row-gap: 2px; align-items: start;
+  padding: 4px 6px;
+  background: var(--c-card);
+  border: 4px solid var(--c-ink);
+  border-radius: var(--radius-sticker);
+  box-shadow: 0 6px 0 var(--c-ink);
+  font-size: var(--fs-small); font-weight: 700; line-height: 1.25; text-align: center;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.s4-card:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 10px 0 var(--c-ink); }
+.s4-card:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 1px 0 var(--c-ink); }
+.s4-card .s4-num { grid-column: 1; grid-row: 1; width: 34px; height: 34px; }
+.s4-card .s4-where { grid-column: 1; grid-row: 1; margin-top: 34px; width: 34px; height: 34px; }
+.s4-card .s4-card-pic { grid-column: 2; grid-row: 1; width: 68px; height: 68px; justify-self: center; border-radius: 8px; }
+.s4-card .label { grid-column: 1 / 3; grid-row: 2; align-self: center; }
+.s4-card.is-selected { transform: translateY(-12px); }
+.s4-card.is-guide { outline: 6px solid var(--c-tape); outline-offset: 3px; animation: guideGlow 2.4s ease-in-out infinite; }
+.s4-card.is-guide:focus-visible { outline-color: var(--c-focus); }
+.s4-card.is-nudge { animation: guideGlow 2.4s ease-in-out 1; }   /* 「さきに ようじを えらぼう」: 1回だけ ゆっくり */
+/* はこから出した あとの 場所（番号だけ のこす。カードの ならびが ずれない） */
+.s4-card-ghost {
+  position: relative; z-index: 1; align-self: stretch;
+  display: flex; align-items: center; justify-content: center;
+  border: 3px dashed var(--c-ink-soft); border-radius: var(--radius-sticker);
+  background: var(--c-card);   /* ink-soft はページ・白の上だけ（6.8:1） */
+}
+
+/* ---------------------------------------------------------
+   下: 道具ボタン（はこに もどす・ぜんぶ もどす）・確認・たしかめる
+   --------------------------------------------------------- */
+.s4-tool {
+  min-width: 0; height: 140px; padding: 0 28px; gap: 12px;
+  font-size: var(--fs-body);
+}
+.s4-tool img { width: 64px; height: 64px; }
+.s4-tool:disabled { border-style: dashed; box-shadow: none; cursor: default; }
+.s4-tool:disabled img { opacity: .4; }   /* 文字は ink のまま */
+.s4-confirm {
+  display: flex; align-items: center; gap: 24px;
+  padding: 8px 12px 8px 24px; height: 140px;
+  background: var(--c-card); border: 5px solid var(--c-ink); border-radius: var(--radius-sticker);
+  box-shadow: 0 6px 0 var(--c-ink);
+}
+.s4-confirm-q { margin: 0; font-size: 36px; font-weight: 700; line-height: 1.6; white-space: nowrap; }
+.s4-confirm .btn-primary, .s4-confirm .btn-secondary { min-width: 180px; height: 120px; padding: 0 28px; font-size: var(--fs-choice); box-shadow: 0 6px 0 var(--c-ink); }
+/* たしかめる（#btn-check。つぎへ と同じ場所・同じ大きさ） */
+.s4-check { flex: none; margin-left: auto; width: 300px; padding: 0 16px; flex-direction: column; gap: 0; }
+.s4-check .label > span { display: block; white-space: nowrap; text-align: center; }
+.s4-check .label > span + span { font-size: var(--fs-body); }
+.s4-check.is-waiting {   /* まだ ぜんぶ おいていない: 白地・点線（文字は ink のまま 12:1） */
+  background: var(--c-card); color: var(--c-ink);
+  border-style: dashed; box-shadow: 0 4px 0 var(--c-ink-soft);
+}
+.s4-check.is-guide { outline: 6px solid var(--c-tape); outline-offset: 4px; animation: guideGlow 2.4s ease-in-out infinite; }
+.s4-check.is-guide:focus-visible { outline-color: var(--c-focus); }
+
+/* ---------------------------------------------------------
+   右の列: やくそく（いつも出す）
+   --------------------------------------------------------- */
+.s4-yakusoku { display: none; }                         /* ステップ4の 表の 画面（plan4）だけで 出す */
+#board[data-layout="plan4"] .s4-yakusoku { display: block; }
+.s4-yakusoku {
+  position: relative;
+  background: var(--c-card); border: 4px solid var(--c-ink);
+  border-radius: 6px 6px 16px 16px;
+  padding: 30px 14px 12px;
+}
+.s4-yakusoku-head {   /* テープで とめた 見出し */
+  position: absolute; left: 14px; top: -24px; margin: 0;
+  font-family: var(--font-hand); font-weight: 400; font-size: 36px; line-height: 1.25;
+  padding: 0 14px; background: var(--c-tape); color: var(--c-ink);
+  transform: rotate(-2deg); border-radius: 3px;
+}
+.s4-rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.s4-rule {
+  display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 10px; align-items: center;
+  font-size: var(--fs-small); font-weight: 700; line-height: 1.5;
+}
+.s4-rule img { width: 56px; height: 56px; }
+.s4-rule .label > span { display: block; white-space: nowrap; }
+.s4-rule.is-now { outline: 5px solid var(--c-ink); outline-offset: 2px; border-radius: 4px; }   /* そのルールを さすとき */
+
+/* ---------------------------------------------------------
+   おさらい（ステップ4から はじめた とき。wide）
+   --------------------------------------------------------- */
+.s4-review { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; width: 100%; height: 100%; }
+.s4-review-panel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+  padding: 18px 16px 16px;
+  border: var(--line) solid var(--c-ink); border-radius: var(--radius-sticker);
+  background: var(--c-card);
+}
+.s4-review-panel.ame  { background: var(--c-rain-bg); }
+.s4-review-panel.soto { background: var(--c-soto-bg); }
+.s4-review-panel.naka { background: var(--c-naka-bg); }
+.s4-review-art { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; min-height: 0; }
+.s4-review-art > img { width: 140px; height: 140px; }
+.s4-review-art .s4-chip { width: 84px; height: 84px; }
+.s4-review-art .s4-chip > img.s4-chip-pic { width: 84px; height: 84px; }
+.s4-review-text { margin: 0; text-align: center; font-size: 36px; font-weight: 700; line-height: 1.6; }
+.s4-review-text > span { display: block; white-space: nowrap; }
+
+/* どうして？ 2-2（かさの ひ 2つを ならべる） */
+.s4-reason-days { display: flex; gap: 40px; align-items: center; }
+.s4-reason-days .day-cell.is-picked { width: 400px; }
+
+/* ---------------------------------------------------------
+   タイトル: ステップを えらぶ に 4つ（2×2。横長の ボタン）
+   --------------------------------------------------------- */
+.title-page.is-picking .step-picker--4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.step-picker--4 .btn-step {
+  width: auto; height: 150px;
+  flex-direction: row; justify-content: flex-start; gap: 14px;
+  padding: 0 16px 0 24px; text-align: left;
+}
+.step-picker--4 .btn-step img { width: 92px; height: 92px; flex: none; }
+.step-picker--4 .btn-step .label { line-height: 1.3; }
+/* ステップ4 ちょうせん: シールの形が ちがう（てちょう＋ほし）＋テープ地＋ぬい目 */
+.btn-step--challenge { background: var(--c-tape-bg); }
+.btn-step--challenge::after {
+  content: ""; position: absolute; inset: 7px; pointer-events: none;
+  border: 3px dashed var(--c-ink); border-radius: 10px 8px 12px 8px;
+}
+
+/* ---------------------------------------------------------
+   ふり返り（ステップ4を クリアした とき: .board--result.is-s4）
+   左に できたこと、右に しゅう1・しゅう2 の よていひょうを 上下に、その下に ボタンを 横に
+   --------------------------------------------------------- */
+.board--result.is-s4 {
+  grid-template-columns: 560px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) 128px;
+  grid-template-areas: "title plan" "list plan" "list acts";
+  row-gap: 18px;
+}
+.board--result.is-s4 .result-left { display: contents; }
+.board--result.is-s4 .result-title { grid-area: title; }
+.board--result.is-s4 .result-list { grid-area: list; min-height: 0; gap: 8px; }
+.board--result.is-s4 .result-plan { grid-area: plan; }
+.board--result.is-s4 .result-actions { grid-area: acts; flex-direction: row; margin-top: 0; }
+.board--result.is-s4 .result-actions .btn-primary,
+.board--result.is-s4 .result-actions .btn-secondary { flex: 1; width: auto; }
+.result-item--sub { padding-left: 92px; position: relative; }   /* ステップ4の 2行目から（メダルの 下に ならべる） */
+.result-item--sub::before {
+  content: ""; position: absolute; left: 44px; top: 50%; width: 36px; height: 36px; transform: translateY(-50%);
+  background: url("assets/icon-check.svg") center / contain no-repeat;
+}
+.week-table--plan4 { --tag-w: 116px; --cell-w: minmax(0, 1fr); column-gap: 8px; }
+.week-table--plan4 .day-cell { padding: 4px 4px 6px; }
+.week-table--plan4 .day-cell .day-mark { width: 56px; height: 56px; }
+.week-table--plan4 .day-cell .day-weather { line-height: 1.3; min-height: calc(2 * 1.3em); }
+.week-table--plan4 .day-cell .day-slot { margin-top: 6px; min-height: 88px; display: flex; align-items: center; justify-content: center; }
+.week-table--plan4 .s4-chip, .week-table--plan4 .s4-chip > img.s4-chip-pic { width: 76px; height: 76px; }
+.week-table--plan4 .s4-chip .s4-num { width: 36px; height: 36px; left: -10px; top: -10px; }
+/* そとの用事の マス: 青空の わく＋そとマーク（形でも わかる） */
+.week-table--plan4 .day-cell.is-soto-plan .day-slot {
+  border: 5px solid var(--c-soto-dark); border-radius: 10px; background: var(--c-soto-bg);
+  padding: 4px;
+}
+
+/* ---------------------------------------------------------
+   うごき すくなめ: アニメは上の きまりで 止まる。うき上がりは 形として のこす
+   --------------------------------------------------------- */
+body.reduce-motion .s4-card:hover, body.reduce-motion .s4-week.is-holding .s4-slot:hover { transform: none; }
+body.reduce-motion .s4-slot.is-guide, body.reduce-motion .s4-card.is-guide, body.reduce-motion .s4-check.is-guide,
+body.reduce-motion .s4-card.is-nudge { box-shadow: 0 8px 0 var(--c-ink), 0 0 0 14px rgba(228,199,126,.95); }
+@media (prefers-reduced-motion: reduce) {
+  .s4-card:hover, .s4-week.is-holding .s4-slot:hover { transform: none; }
+  .s4-slot.is-guide, .s4-card.is-guide, .s4-check.is-guide, .s4-card.is-nudge { box-shadow: 0 8px 0 var(--c-ink), 0 0 0 14px rgba(228,199,126,.95); }
+}
+.s4-slot.is-redo.is-selected { border-style: solid; }
