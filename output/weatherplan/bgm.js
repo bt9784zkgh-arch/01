@@ -6,7 +6,9 @@
  *   Sound.start()            // BGMを小さくフェードインして開始（「はじめる」クリックの中で呼ぶ）
  *   Sound.stop()             // BGMをフェードアウトして止める（おやすみ画面など）
  *   Sound.setMuted(bool)     // おと あり／なし（BGMも効果音もまとめて消す）
- *   Sound.play('tap' | 'correct' | 'retry' | 'clear')
+ *   Sound.play('tap' | 'correct' | 'retry' | 'clear' | 'place' | 'stamp')
+ *     place … ステップ4 カードをマスに おいた「ぺた」 / stamp … 答え合わせのスタンプ「ぽん」（近すぎる連打は間引く）
+ *     知らない名前を渡しても何もしない（エラーにしない）
  *   （おまけ）Sound.isMuted() / Sound.isPlaying()
  *
  * 曲: 「てちょうを ひらく あさ」 ヘ長調（F major）・4/4・テンポ90・16小節ループ（約42.7秒）
@@ -37,6 +39,8 @@
   var FADE_OUT = 1.0;             // 秒
   var LOOKAHEAD = 0.35;           // 先読みして予約する秒数
   var TICK_MS = 90;
+  var STAMP_MIN_GAP = 0.22;       // stamp がこれより近い間隔で呼ばれたら鳴らさない（秒）
+  var STAMP_SERIES_GAP = 1.2;     // これ以内に続いたら「同じ答え合わせの続き」とみなす（秒）
 
   /* ---------- 曲データ（オリジナル） ----------
    * MIDI番号: E4=64 F4=65 G4=67 A4=69 Bb4=70 C5=72 D5=74 E5=76 F5=77 G5=79
@@ -71,6 +75,7 @@
       sfxBus = null, reverb = null, revSend = null;
   var muted = false, playing = false, timer = null, stopTimer = null;
   var nextBarTime = 0, barIndex = 0, duckUntil = 0, duckTimer = null;
+  var lastStampAt = -10, stampCount = 0;
 
   function safe(fn) { return function () { try { return fn.apply(null, arguments); } catch (e) { /* 音が出なくてもゲームは続ける */ } }; }
 
@@ -262,6 +267,41 @@
       });
       strike(sfxBus, tc + 0.25, mtof(84), 0.04, 1.2, CELESTA, 0);  // きらっと一つ
       return 1.9;
+    },
+    // ぺた：シールを はる やわらかい音（紙がふれる小さな「さっ」＋低めの丸い「ぽこ」。約0.2秒）
+    place: function (t) {
+      // 紙の音：短いノイズを低めのバンドパスでまるくする
+      var len = Math.floor(ctx.sampleRate * 0.06), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+      var n = ctx.createBufferSource(), nf = ctx.createBiquadFilter(), ng = ctx.createGain();
+      n.buffer = buf;
+      nf.type = 'bandpass'; nf.frequency.value = 1400; nf.Q.value = 0.8;
+      ng.gain.value = 0.07;
+      n.connect(nf); nf.connect(ng); ng.connect(sfxBus); n.start(t);
+      // おさえる音：少しだけ下がるサイン波
+      var o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(420, t + 0.01);
+      o.frequency.exponentialRampToValueAtTime(260, t + 0.12);
+      f.type = 'lowpass'; f.frequency.value = 900;
+      g.gain.setValueAtTime(0.0001, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.15, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+      o.connect(f); f.connect(g); g.connect(sfxBus);
+      o.start(t + 0.01); o.stop(t + 0.24);
+      return 0.22;
+    },
+    // ぽん（スタンプ）：小さく まるい木の音。続けて押すと、ほんの少しずつ高くなる（ヘ長調の音で7つまで）
+    stamp: function (t) {
+      var now = ctx.currentTime;
+      if (now - lastStampAt < STAMP_MIN_GAP) return -1;           // 近すぎるときは間引く
+      stampCount = (now - lastStampAt <= STAMP_SERIES_GAP) ? stampCount + 1 : 0;
+      lastStampAt = now;
+      var SCALE = [65, 67, 69, 72, 74, 77, 79];                   // F G A C D F G
+      var m = SCALE[Math.min(stampCount, SCALE.length - 1)];
+      var vol = 0.09 * Math.max(0.75, 1 - stampCount * 0.04);     // 続くほど ほんの少し小さく
+      strike(sfxBus, t, mtof(m), vol, 0.28, MARIMBA, 0);
+      return 0.3;
     }
   };
 
@@ -308,12 +348,12 @@
     }),
 
     play: safe(function (name) {
-      if (muted || !SFX[name]) return;
+      if (muted || typeof name !== 'string' || !Object.prototype.hasOwnProperty.call(SFX, name)) return;
       init();
       if (ctx.state === 'suspended') ctx.resume();
       var t = ctx.currentTime + 0.01;
       var len = SFX[name](t);
-      duck(len + 0.1);
+      if (len > 0) duck(len + 0.1);       // 間引いたとき（-1）はダッキングもしない
     }),
 
     isMuted: function () { return muted; },
