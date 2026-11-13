@@ -53,6 +53,16 @@
   /* タイトル: 飾りの週が ちぢまないように。サブの文を1行に */
   .title-week { flex: none; }
   .title-sub { font-size: var(--fs-body); }
+  /* ---- ステップ4 で style.css を補う分 ---- */
+  .clear-actions { gap: 40px; }                                   /* ステップ3クリア:「ふり返りへ」「ちょうせんする」 */
+  #btn-clear-result ruby rt { color: inherit; }
+  .s4-reason-days .day-slot { display: flex; align-items: center; gap: 8px; }
+  .s4-reason-badge { width: 72px; height: 72px; flex: none; }      /* どうして？2-2: そと／なか の しるし */
+  .s4-glow-img { animation: s4ImgGlow 2.4s ease-in-out infinite; }  /* ヒント: 家マークなどを ゆっくり光らせる（点滅しない） */
+  @keyframes s4ImgGlow { 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 10px #E4C77E) drop-shadow(0 0 4px #B8913A); } }
+  body.reduce-motion .s4-glow-img { filter: drop-shadow(0 0 10px #E4C77E) drop-shadow(0 0 4px #B8913A); }
+  @media (prefers-reduced-motion: reduce) { .s4-glow-img { filter: drop-shadow(0 0 10px #E4C77E) drop-shadow(0 0 4px #B8913A); } }
+  .s4-card[hidden], .s4-card-ghost[hidden] { display: none !important; }
 </style>
 </head>
 <body>
@@ -63,7 +73,7 @@
   <header id="topbar">
     <div id="step-tag" hidden></div>
     <div id="progress" hidden>
-      <p class="progress-text" style="margin:0"><span id="prog-step"></span><span id="prog-q"></span></p>
+      <p class="progress-text" style="margin:0"><span id="prog-step"></span><span id="prog-q"></span><span id="prog-placed" hidden></span></p>
       <ol class="progress-dots" id="progress-dots"></ol>
     </div>
     <div id="settings">
@@ -116,10 +126,20 @@
       <div id="choices">
         <div id="choice-list" class="choice-list"></div>
         <button id="btn-next" class="btn-primary" type="button" hidden>つぎへ</button>
+        <button id="btn-check" class="btn-primary s4-check is-waiting" type="button" hidden>
+          <span class="label"><span>たしかめる</span><span id="btn-check-left">あと 4こ</span></span></button>
       </div>
       <div id="side">
         <div id="feedback" role="status" aria-live="polite"><img src="assets/stamp-good.svg" alt=""><span class="feedback-word"></span></div>
         <div id="speech" class="speech" aria-live="polite"></div>
+        <section id="s4-yakusoku" class="s4-yakusoku" aria-labelledby="s4-yakusoku-head">
+          <h3 class="s4-yakusoku-head" id="s4-yakusoku-head">やくそく</h3>
+          <ol class="s4-rules">
+            <li class="s4-rule"><img src="assets/rule-1.svg" alt=""><span class="label"><span>1にちに ようじは</span><span>1つ</span></span></li>
+            <li class="s4-rule"><img src="assets/rule-2.svg" alt=""><span class="label"><span>そとの ようじは</span><span>はれの ひに</span></span></li>
+            <li class="s4-rule"><img src="assets/rule-3.svg" alt=""><span class="label"><span>なかの ようじは</span><span>どの ひでも いい</span></span></li>
+          </ol>
+        </section>
         <img id="guide" class="guide" src="assets/guide.svg" alt="てちょうを もった せんぱい">
       </div>
     </div>
@@ -138,6 +158,7 @@
         </div>
       </div>
       <div class="clear-actions">
+        <button id="btn-clear-result" class="btn-secondary" type="button" hidden>ふり<ruby>返<rt>かえ</rt></ruby>りへ</button>
         <button id="btn-clear-next" class="btn-primary" type="button" hidden>つぎへ</button>
       </div>
       <div class="clear-side">
