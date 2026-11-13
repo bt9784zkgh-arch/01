@@ -56,8 +56,11 @@
   /* ---- ステップ4 で style.css を補う分 ---- */
   .clear-actions { gap: 40px; }                                   /* ステップ3クリア:「ふり返りへ」「ちょうせんする」 */
   #btn-clear-result ruby rt { color: inherit; }
-  .s4-reason-days .day-slot { display: flex; align-items: center; gap: 8px; }
-  .s4-reason-badge { width: 72px; height: 72px; flex: none; }      /* どうして？2-2: そと／なか の しるし */
+  /* どうして？2-2: 長い用事の名前は スペースで 2行に。そと／なか の しるしは 絵の右上に重ねる（マスから出さない） */
+  .s4-reason-days .day-cell.is-picked .day-slot { position: relative; min-width: 0; max-width: 100%; }
+  .s4-reason-days .task-chip { white-space: normal; text-align: center; max-width: 100%; }
+  .s4-reason-days .task-chip .label { display: block; }
+  .s4-reason-badge { position: absolute; right: -6px; top: -10px; width: 60px; height: 60px; }
   .s4-glow-img { animation: s4ImgGlow 2.4s ease-in-out infinite; }  /* ヒント: 家マークなどを ゆっくり光らせる（点滅しない） */
   @keyframes s4ImgGlow { 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 10px #E4C77E) drop-shadow(0 0 4px #B8913A); } }
   body.reduce-motion .s4-glow-img { filter: drop-shadow(0 0 10px #E4C77E) drop-shadow(0 0 4px #B8913A); }
@@ -158,7 +161,7 @@
         </div>
       </div>
       <div class="clear-actions">
-        <button id="btn-clear-result" class="btn-secondary" type="button" hidden>ふり<ruby>返<rt>かえ</rt></ruby>りへ</button>
+        <button id="btn-clear-result" class="btn-secondary" type="button" hidden><span class="label">ふり<ruby>返<rt>かえ</rt></ruby>りへ</span></button>
         <button id="btn-clear-next" class="btn-primary" type="button" hidden>つぎへ</button>
       </div>
       <div class="clear-side">

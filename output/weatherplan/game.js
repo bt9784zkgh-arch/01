@@ -157,7 +157,7 @@ const LESSON = {
     {
       kind: 'challenge',
       name: 'よていひょうを つくろう',
-      progName: 'ちょうせん（ステップ4）',
+      progName: 'ちょうせん',
       pickLabel: ['ステップ4', 'ちょうせん', 'よていひょう'],
       clearSub: '1しゅうかんの よていが たてられたね',
       clearSay: 'ちょうせんの シールも はれたね',
@@ -455,7 +455,8 @@ addEventListener('resize', fitApp); fitApp();
     if (restRerender) { restRerender = false; go(state.page, true); return; }
     // 「ひとやすみ」ボタンには もどさない（Enter で また ひらかないように）
     const act = $('.screen.is-active');
-    const nb = act && $$('#btn-next, #btn-clear-next', act).find(b => !b.hidden && b.offsetParent);
+    const nb = act && (act === screens.clear && !$('#btn-clear-result').hidden ? $('#clear-text')
+      : $$('#btn-next, #btn-clear-next', act).find(b => !b.hidden && b.offsetParent));
     if (restReturnFocus && restReturnFocus !== btnRest && document.contains(restReturnFocus) && !restReturnFocus.disabled && restReturnFocus.offsetParent) focusQuiet(restReturnFocus);
     else if (nb) focusQuiet(nb);
     else if (state.page >= 0 && act === screens.play) focusQuiet(qText);
@@ -505,7 +506,9 @@ addEventListener('resize', fitApp); fitApp();
   function setProgress(si, label, doneCount, nowIdx) {
     const st = LESSON.steps[si], n = st.questions.length;
     stepTag.innerHTML = ruby(st.name);
-    progStep.textContent = st.progName || ('ステップ ' + (si + 1) + ' ／ ' + LESSON.steps.length);
+    // ステップ1〜3 は「ステップ ○ ／ 3」（ちょうせんは えらべる課題なので 数に入れない）。ちょうせんは「ちょうせん」
+    const baseSteps = LESSON.steps.filter(x => x.kind !== 'challenge').length;
+    progStep.textContent = st.progName || ('ステップ ' + (si + 1) + ' ／ ' + baseSteps);
     progQ.textContent = label;
     progDots.innerHTML = '';
     for (let i = 0; i < n; i++) {
@@ -1420,7 +1423,7 @@ addEventListener('resize', fitApp); fitApp();
     P.hint = { look: normal.filter(r => r.n === 1).map(r => r.day), sun: normal.some(r => r.n === 2) };
     const first = normal[0];
     let text = '';
-    if (autos.length) text = fill(W.together, { task: LESSON.tasks[autos[0].task].name });
+    if (autos.length) text = fill(W.together, { task: autos.map(a => LESSON.tasks[a.task].name).join('と ') });
     else if (normal.some(r => r.n >= 2)) text = W.sunHint;
     else if (first) text = kumoriOrKasa(P.w[first.day]) === 'kasa' ? W.redoKasa : W.redoKumori;
     P.speech = text;
@@ -1475,6 +1478,7 @@ addEventListener('resize', fitApp); fitApp();
     const P = S4.P, D = S4.D, q = LESSON.steps[P.si].questions[P.qi], W = s4Words(P.si);
     P.phase = 'good';
     s4ClearHints();
+    if (!quiet) focusQuiet(qText);   // つぎへ が出るまでの間も body に しない
     btnCheck.hidden = true;
     state.plan4[P.week] = Object.assign({}, P.place);
     showFeedback('good', 'せいかい！');
@@ -1604,6 +1608,10 @@ addEventListener('resize', fitApp); fitApp();
     later(() => {
       D.tejun.forEach(x => x.classList.remove('is-now'));
       setSpeech(m.check);
+      // おてほんでは「ぜんぶ おいた」ときの 見た目で 光らせる
+      btnCheck.classList.remove('is-waiting');
+      $('#btn-check-left').hidden = true;
+      btnCheck.setAttribute('aria-label', 'たしかめる');
       btnCheck.classList.add('is-guide');
     }, t);
     later(() => {
@@ -1666,7 +1674,9 @@ addEventListener('resize', fitApp); fitApp();
     await new Promise(r => setTimeout(r, 300));
     if (tok !== state.token) return;
     state.clearPending = false;
-    nb.hidden = false; rb.hidden = !offer; focusQuiet(nb);
+    nb.hidden = false; rb.hidden = !offer;
+    // ちょうせんを えらべる時は、ボタンではなく 見出しに フォーカス（生徒が 自分で えらぶ）
+    focusQuiet(offer ? $('#clear-text') : nb);
   }
 
   function renderResult() {
